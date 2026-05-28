@@ -8,68 +8,35 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#F7F5F0;
-  --white:#FFFFFF;
-  --card:#FFFFFF;
-  --border:#E2DDD6;
-  --border2:#CCC8BF;
-  --text:#111111;
-  --text2:#555550;
-  --text3:#999892;
-  --accent:#0033A0;
-  --accent2:#E8192C;
-  --gold:#F5C800;
-  --green:#00843D;
-  --fuchsia:#C6007E;
-  --radius:10px;
-  --radius-lg:16px;
+  --bg:#F7F5F0;--white:#FFFFFF;--card:#FFFFFF;--border:#E2DDD6;--border2:#CCC8BF;
+  --text:#111111;--text2:#555550;--text3:#999892;
+  --accent:#0033A0;--accent2:#E8192C;--gold:#F5C800;--green:#00843D;
+  --radius:10px;--radius-lg:16px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-height:100vh;font-size:15px}
-
-/* BG PATTERN — subtle 26 watermark */
-body::before{
-  content:'26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26';
-  position:fixed;top:0;left:0;right:0;bottom:0;
-  font-family:'Barlow Condensed',sans-serif;font-size:80px;font-weight:900;
-  color:rgba(0,0,0,0.028);line-height:1.1;letter-spacing:12px;
-  word-break:break-all;overflow:hidden;pointer-events:none;z-index:0;padding:20px;
-}
-
-/* HEADER */
+body::before{content:'26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26 26';position:fixed;top:0;left:0;right:0;bottom:0;font-family:'Barlow Condensed',sans-serif;font-size:80px;font-weight:900;color:rgba(0,0,0,0.028);line-height:1.1;letter-spacing:12px;word-break:break-all;overflow:hidden;pointer-events:none;z-index:0;padding:20px;}
 .header{background:var(--accent);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,51,.18)}
 .header-logo{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;letter-spacing:3px;color:var(--white);display:flex;align-items:center;gap:10px}
 .header-logo .logo-badge{background:var(--gold);color:var(--accent);padding:2px 10px;border-radius:4px;font-size:22px}
-.nav{display:flex;gap:3px}
+.nav{display:flex;gap:3px;align-items:center}
 .nav-btn{background:none;border:none;color:rgba(255,255,255,.65);font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:8px 16px;border-radius:var(--radius);cursor:pointer;transition:all .18s}
 .nav-btn:hover{background:rgba(255,255,255,.12);color:var(--white)}
 .nav-btn.active{background:var(--gold);color:var(--accent)}
-
-/* PAGES */
+.nav-btn.locked{color:rgba(255,255,255,.3);cursor:default}
+.nav-btn.locked:hover{background:none}
+.admin-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);cursor:pointer;margin-left:8px;opacity:.4;transition:opacity .2s}
+.admin-dot:hover{opacity:1}
 .page{display:none;padding:28px 20px;max-width:720px;margin:0 auto;position:relative;z-index:1}
 .page.active{display:block}
-
-/* API BANNER */
-.api-banner{background:var(--white);border:1.5px solid var(--gold);border-radius:var(--radius-lg);padding:18px 20px;margin-bottom:24px}
-.api-banner-title{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text2);margin-bottom:6px}
-.api-banner p{font-size:13px;color:var(--text3);margin-bottom:10px;line-height:1.5}
-.api-row{display:flex;gap:8px}
-.api-input{flex:1;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 12px;color:var(--text);font-family:'Barlow',sans-serif;font-size:13px}
-.api-save-btn{background:var(--accent);color:var(--white);border:none;border-radius:var(--radius);padding:9px 18px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:1px;cursor:pointer;transition:opacity .15s}
-.api-save-btn:hover{opacity:.85}
-.api-status{font-size:12px;margin-top:7px;color:var(--text3)}
-.api-status.ok{color:var(--green)}
-.api-status.err{color:var(--accent2)}
-
-/* SECTION HEAD */
+.hero{background:var(--accent);border-radius:var(--radius-lg);padding:22px 24px;margin-bottom:24px;position:relative;overflow:hidden}
+.hero::after{content:'26';position:absolute;right:-10px;top:-20px;font-family:'Barlow Condensed',sans-serif;font-size:140px;font-weight:900;color:rgba(255,255,255,.07);pointer-events:none;line-height:1}
+.hero-label{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:4px}
+.hero-title{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;letter-spacing:2px;color:var(--white);text-transform:uppercase;line-height:1.1}
+.hero-sub{font-size:13px;color:rgba(255,255,255,.6);margin-top:6px;font-weight:500}
 .section-head{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:var(--accent);margin:24px 0 10px;display:flex;align-items:center;gap:8px}
-.section-head:first-of-type{margin-top:0}
 .section-head .sh-line{flex:1;height:1.5px;background:linear-gradient(90deg,var(--accent) 0%,transparent 100%);opacity:.2}
-
-/* CARD */
 .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.04)}
-
-/* MATCH ROW */
 .match-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--border)}
 .match-row:last-child{border-bottom:none}
 .team{font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:7px}
@@ -82,74 +49,85 @@ body::before{
 .score-inputs input:focus{outline:none;border-color:var(--accent)}
 .dash{color:var(--text3);font-size:18px;font-weight:700}
 .date-lbl{font-size:11px;color:var(--text3);font-weight:500;letter-spacing:.04em}
-
-/* FORM FIELDS */
 .field-wrap{margin-bottom:14px}
 .field-lbl{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--text2);margin-bottom:5px}
 .field-input{width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:10px 13px;color:var(--text);font-family:'Barlow',sans-serif;font-size:14px;transition:border-color .15s}
 .field-input:focus{outline:none;border-color:var(--accent)}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 select.field-input option{background:var(--white)}
-
-/* SEARCHABLE DROPDOWN */
 .searchable-wrap{position:relative}
 .drop-list{position:absolute;top:calc(100%+3px);left:0;right:0;background:var(--white);border:1px solid var(--border2);border-radius:var(--radius);max-height:210px;overflow-y:auto;z-index:500;display:none;box-shadow:0 8px 24px rgba(0,0,0,.1)}
 .drop-list.open{display:block}
 .drop-item{padding:9px 12px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:9px;color:var(--text);font-weight:500;border-bottom:1px solid var(--border)}
 .drop-item:last-child{border-bottom:none}
-.drop-item:hover,.drop-item.sel{background:var(--bg)}
-.drop-item img{width:22px;height:15px;border-radius:2px;object-fit:cover;box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.drop-item:hover{background:var(--bg)}
+.drop-item img{width:22px;height:15px;border-radius:2px;object-fit:cover}
 .no-res{padding:10px 12px;font-size:13px;color:var(--text3)}
-
-/* SUBMIT */
 .submit-btn{width:100%;padding:15px;background:var(--accent);border:none;border-radius:var(--radius-lg);font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;letter-spacing:3px;color:var(--white);cursor:pointer;margin-top:24px;transition:all .2s;text-transform:uppercase}
 .submit-btn:hover{background:#002280;transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,51,160,.3)}
 .submit-btn:disabled{background:var(--text3);cursor:not-allowed;transform:none;box-shadow:none}
 .msg{text-align:center;font-size:13px;margin-top:10px;min-height:18px;color:var(--text3);font-weight:600}
-.msg.ok{color:var(--green)}
-.msg.err{color:var(--accent2)}
-
-/* OVERVIEW STATS */
+.msg.ok{color:var(--green)}.msg.err{color:var(--accent2)}
+.deadline-banner{background:#fff3cd;border:1px solid var(--gold);border-radius:var(--radius);padding:12px 16px;margin-bottom:20px;font-size:13px;color:#7a6000;font-weight:600;display:flex;align-items:center;gap:8px}
+.locked-banner{background:var(--accent);border-radius:var(--radius-lg);padding:40px 24px;text-align:center;color:var(--white)}
+.locked-banner .lock-icon{font-size:48px;margin-bottom:12px}
+.locked-banner h2{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;letter-spacing:2px;margin-bottom:8px}
+.locked-banner p{font-size:14px;color:rgba(255,255,255,.7);line-height:1.6}
 .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
 .stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 12px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.04)}
 .stat-num{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;color:var(--accent);line-height:1.1}
 .stat-lbl{font-size:11px;color:var(--text3);margin-top:4px;text-transform:uppercase;letter-spacing:.07em;font-weight:600}
-
-/* ENTRY CARDS */
 .entries-list{display:flex;flex-direction:column;gap:10px}
 .entry-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.04)}
 .entry-card-header{background:var(--accent);padding:10px 16px;display:flex;align-items:center;justify-content:space-between}
 .entry-name{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;letter-spacing:1.5px;color:var(--white);text-transform:uppercase}
 .entry-date{font-size:11px;color:rgba(255,255,255,.6);font-weight:500}
+.entry-points{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:var(--gold)}
 .entry-body{padding:14px 16px}
 .entry-section-lbl{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:7px;display:flex;align-items:center;gap:6px}
 .match-mini{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text2);margin-bottom:4px;font-weight:500}
 .match-mini .score{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;color:var(--accent);min-width:36px}
-.mini-flag{width:18px;height:12px;border-radius:2px;object-fit:cover;flex-shrink:0;box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.match-mini .pts{font-size:11px;padding:1px 6px;border-radius:10px;font-weight:700;margin-left:4px}
+.pts-exact{background:#d4edda;color:#155724}
+.pts-winner{background:#fff3cd;color:#856404}
+.pts-none{background:#f8d7da;color:#721c24}
+.mini-flag{width:18px;height:12px;border-radius:2px;object-fit:cover;flex-shrink:0}
 .entry-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
 .entry-item{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);font-weight:600}
 .entry-item strong{color:var(--text);display:flex;align-items:center;gap:5px;font-size:13px;margin-top:2px;font-weight:600;letter-spacing:0;text-transform:none;font-family:'Barlow',sans-serif}
 .entry-item strong img{width:18px;height:12px;border-radius:2px;object-fit:cover}
-
-/* RAPPORT */
+.leaderboard{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:20px}
+.lb-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border)}
+.lb-row:last-child{border-bottom:none}
+.lb-row.lb-first{background:linear-gradient(90deg,rgba(245,200,0,.08),transparent)}
+.lb-rank{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:var(--text3);width:28px;text-align:center}
+.lb-rank.gold{color:var(--gold)}
+.lb-name{flex:1;font-weight:600;font-size:14px}
+.lb-pts{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:var(--accent)}
+.lb-pts span{font-size:11px;color:var(--text3);font-weight:400;margin-left:2px}
+.real-scores-card{background:var(--card);border:1.5px solid var(--gold);border-radius:var(--radius-lg);padding:16px;margin-bottom:20px}
+.real-scores-title{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text2);margin-bottom:12px}
+.real-score-row{display:grid;grid-template-columns:1fr auto 1fr auto;align-items:center;gap:8px;margin-bottom:8px;font-size:13px}
+.real-score-row:last-child{margin-bottom:0}
+.rs-team{display:flex;align-items:center;gap:6px;font-weight:600}
+.rs-team.right{justify-content:flex-end;flex-direction:row-reverse}
+.rs-inputs{display:flex;align-items:center;gap:5px}
+.rs-inputs input{width:36px;height:36px;text-align:center;font-size:15px;font-weight:700;border:1px solid var(--border2);border-radius:6px;background:var(--bg);color:var(--text);-moz-appearance:textfield;font-family:'Barlow Condensed',sans-serif}
+.rs-inputs input::-webkit-outer-spin-button,.rs-inputs input::-webkit-inner-spin-button{-webkit-appearance:none}
+.rs-inputs input:focus{outline:none;border-color:var(--gold)}
+.rs-played{font-size:11px;color:var(--text3);text-align:center}
+.save-scores-btn{background:var(--gold);color:var(--accent);border:none;border-radius:var(--radius);padding:9px 20px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:1px;cursor:pointer;margin-top:10px;transition:opacity .15s}
+.save-scores-btn:hover{opacity:.85}
 .chart-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
 .chart-title{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:14px;border-bottom:2px solid var(--accent);padding-bottom:8px;display:inline-block}
 .chart-wrap{position:relative;height:260px}
 .btn-row{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
 .action-btn{background:var(--white);border:1.5px solid var(--border2);border-radius:var(--radius);padding:9px 18px;color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:7px}
 .action-btn:hover{border-color:var(--accent);color:var(--accent)}
-
 .empty-state{text-align:center;padding:48px 20px;color:var(--text3)}
 .empty-state .big{font-family:'Barlow Condensed',sans-serif;font-size:72px;font-weight:900;color:var(--border2);line-height:1}
 .loading{text-align:center;padding:40px;color:var(--text3);font-size:14px}
-
-/* WE ARE 26 hero */
-.hero{background:var(--accent);border-radius:var(--radius-lg);padding:22px 24px;margin-bottom:24px;position:relative;overflow:hidden}
-.hero::after{content:'26';position:absolute;right:-10px;top:-20px;font-family:'Barlow Condensed',sans-serif;font-size:140px;font-weight:900;color:rgba(255,255,255,.07);pointer-events:none;line-height:1}
-.hero-label{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:4px}
-.hero-title{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;letter-spacing:2px;color:var(--white);text-transform:uppercase;line-height:1.1}
-.hero-sub{font-size:13px;color:rgba(255,255,255,.6);margin-top:6px;font-weight:500}
-
+.admin-badge{background:var(--gold);color:var(--accent);font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;margin-left:6px}
 ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
 </style>
 </head>
@@ -158,133 +136,77 @@ select.field-input option{background:var(--white)}
 <header class="header">
   <div class="header-logo">
     <span>WK</span><span class="logo-badge">26</span><span>Pool</span>
+    <span id="admin-badge" class="admin-badge" style="display:none">ADMIN</span>
   </div>
   <nav class="nav">
-    <button class="nav-btn active" onclick="goto('invullen')">Voorspelling</button>
-    <button class="nav-btn" onclick="goto('overzicht')">Overzicht</button>
-    <button class="nav-btn" onclick="goto('rapport')">Rapport</button>
+    <button class="nav-btn active" id="nav-invullen" onclick="goto('invullen')">Voorspelling</button>
+    <button class="nav-btn locked" id="nav-overzicht" onclick="tryNav('overzicht')">Overzicht</button>
+    <button class="nav-btn locked" id="nav-rapport" onclick="tryNav('rapport')">Rapport</button>
+    <div class="admin-dot" title="Beheerder" onclick="promptAdmin()"></div>
   </nav>
 </header>
 
 <!-- INVULLEN -->
 <div id="page-invullen" class="page active">
-
   <div class="hero">
     <div class="hero-label">We Are 26</div>
     <div class="hero-title">Jouw WK Voorspelling</div>
-    <div class="hero-sub">Vul hieronder je voorspellingen in voor de poulewedstrijden en het eindresultaat.</div>
+    <div class="hero-sub" id="hero-sub">Vul hieronder je voorspellingen in voor de poulewedstrijden en het eindresultaat.</div>
   </div>
-
-  <div id="api-status-bar" style="display:none;background:#fff3cd;border:1px solid #F5C800;border-radius:var(--radius);padding:10px 14px;margin-bottom:16px;font-size:13px;color:#555"></div>
-
-  <div class="section-head">🇳🇱 Nederland – Poule F <div class="sh-line"></div></div>
-  <div class="card">
-    <div class="match-row">
-      <div class="team"><img class="flag-img" src="https://flagcdn.com/w40/nl.png" alt="NL">Nederland</div>
-      <div class="score-col">
-        <div class="score-inputs"><input type="number" min="0" max="20" id="nl1h"><span class="dash">–</span><input type="number" min="0" max="20" id="nl1a"></div>
-        <div class="date-lbl">14 jun</div>
+  <div id="api-status-bar" style="display:none;background:#fff3cd;border:1px solid var(--gold);border-radius:var(--radius);padding:10px 14px;margin-bottom:16px;font-size:13px"></div>
+  <div id="form-content">
+    <div class="section-head">🇳🇱 Nederland – Poule F <div class="sh-line"></div></div>
+    <div class="card">
+      <div class="match-row">
+        <div class="team"><img class="flag-img" src="https://flagcdn.com/w40/nl.png">Nederland</div>
+        <div class="score-col"><div class="score-inputs"><input type="number" min="0" max="20" id="nl1h"><span class="dash">–</span><input type="number" min="0" max="20" id="nl1a"></div><div class="date-lbl">14 jun</div></div>
+        <div class="team right"><img class="flag-img" src="https://flagcdn.com/w40/jp.png">Japan</div>
       </div>
-      <div class="team right"><img class="flag-img" src="https://flagcdn.com/w40/jp.png" alt="JP">Japan</div>
-    </div>
-    <div class="match-row">
-      <div class="team"><img class="flag-img" src="https://flagcdn.com/w40/nl.png" alt="NL">Nederland</div>
-      <div class="score-col">
-        <div class="score-inputs"><input type="number" min="0" max="20" id="nl2h"><span class="dash">–</span><input type="number" min="0" max="20" id="nl2a"></div>
-        <div class="date-lbl">20 jun</div>
+      <div class="match-row">
+        <div class="team"><img class="flag-img" src="https://flagcdn.com/w40/nl.png">Nederland</div>
+        <div class="score-col"><div class="score-inputs"><input type="number" min="0" max="20" id="nl2h"><span class="dash">–</span><input type="number" min="0" max="20" id="nl2a"></div><div class="date-lbl">20 jun</div></div>
+        <div class="team right"><img class="flag-img" src="https://flagcdn.com/w40/se.png">Zweden</div>
       </div>
-      <div class="team right"><img class="flag-img" src="https://flagcdn.com/w40/se.png" alt="SE">Zweden</div>
-    </div>
-    <div class="match-row">
-      <div class="team"><img class="flag-img" src="https://flagcdn.com/w40/nl.png" alt="NL">Nederland</div>
-      <div class="score-col">
-        <div class="score-inputs"><input type="number" min="0" max="20" id="nl3h"><span class="dash">–</span><input type="number" min="0" max="20" id="nl3a"></div>
-        <div class="date-lbl">26 jun</div>
+      <div class="match-row">
+        <div class="team"><img class="flag-img" src="https://flagcdn.com/w40/nl.png">Nederland</div>
+        <div class="score-col"><div class="score-inputs"><input type="number" min="0" max="20" id="nl3h"><span class="dash">–</span><input type="number" min="0" max="20" id="nl3a"></div><div class="date-lbl">26 jun</div></div>
+        <div class="team right"><img class="flag-img" src="https://flagcdn.com/w40/tn.png">Tunesië</div>
       </div>
-      <div class="team right"><img class="flag-img" src="https://flagcdn.com/w40/tn.png" alt="TN">Tunesië</div>
     </div>
+    <div class="section-head">🇧🇪 België – Poule G <div class="sh-line"></div></div>
+    <div class="card">
+      <div class="match-row">
+        <div class="team"><img class="flag-img" src="https://flagcdn.com/w40/be.png">België</div>
+        <div class="score-col"><div class="score-inputs"><input type="number" min="0" max="20" id="be1h"><span class="dash">–</span><input type="number" min="0" max="20" id="be1a"></div><div class="date-lbl">15 jun</div></div>
+        <div class="team right"><img class="flag-img" src="https://flagcdn.com/w40/eg.png">Egypte</div>
+      </div>
+      <div class="match-row">
+        <div class="team"><img class="flag-img" src="https://flagcdn.com/w40/be.png">België</div>
+        <div class="score-col"><div class="score-inputs"><input type="number" min="0" max="20" id="be2h"><span class="dash">–</span><input type="number" min="0" max="20" id="be2a"></div><div class="date-lbl">21 jun</div></div>
+        <div class="team right"><img class="flag-img" src="https://flagcdn.com/w40/ir.png">Iran</div>
+      </div>
+      <div class="match-row">
+        <div class="team"><img class="flag-img" src="https://flagcdn.com/w40/nz.png">Nieuw-Zeeland</div>
+        <div class="score-col"><div class="score-inputs"><input type="number" min="0" max="20" id="be3h"><span class="dash">–</span><input type="number" min="0" max="20" id="be3a"></div><div class="date-lbl">26 jun</div></div>
+        <div class="team right"><img class="flag-img" src="https://flagcdn.com/w40/be.png">België</div>
+      </div>
+    </div>
+    <div class="section-head">🏆 Toernooi <div class="sh-line"></div></div>
+    <div class="card" style="padding:18px 16px">
+      <div class="row2" style="margin-bottom:14px">
+        <div class="field-wrap" style="margin:0"><div class="field-lbl">Winnaar WK</div><div class="searchable-wrap"><input class="field-input" id="inp-winner" placeholder="Zoek land..." autocomplete="off" readonly onfocus="openDrop('winner')" oninput="filterDrop('winner',this.value)"><input type="hidden" id="val-winner"><div class="drop-list" id="drop-winner"></div></div></div>
+        <div class="field-wrap" style="margin:0"><div class="field-lbl">Verliezend finalist</div><div class="searchable-wrap"><input class="field-input" id="inp-finalist" placeholder="Zoek land..." autocomplete="off" readonly onfocus="openDrop('finalist')" oninput="filterDrop('finalist',this.value)"><input type="hidden" id="val-finalist"><div class="drop-list" id="drop-finalist"></div></div></div>
+      </div>
+      <div class="row2" style="margin-bottom:14px">
+        <div class="field-wrap" style="margin:0"><div class="field-lbl">Hoe ver Nederland?</div><select class="field-input" id="nlver"><option value="">– kies –</option><option>Groepsfase uit</option><option>1/16 finale</option><option>1/8 finale</option><option>Kwartfinale</option><option>Halve finale</option><option>Derde plaats</option><option>Finale (verlies)</option><option>🏆 Wereldkampioen</option></select></div>
+        <div class="field-wrap" style="margin:0"><div class="field-lbl">Hoe ver België?</div><select class="field-input" id="bever"><option value="">– kies –</option><option>Groepsfase uit</option><option>1/16 finale</option><option>1/8 finale</option><option>Kwartfinale</option><option>Halve finale</option><option>Derde plaats</option><option>Finale (verlies)</option><option>🏆 Wereldkampioen</option></select></div>
+      </div>
+      <div class="field-wrap" style="margin:0 0 14px"><div class="field-lbl">Topscorer</div><input type="text" class="field-input" id="topscorer" placeholder="Naam van de topscorer..."></div>
+      <div class="field-wrap" style="margin:0"><div class="field-lbl">Jouw naam</div><input type="text" class="field-input" id="pname" placeholder="Naam..."></div>
+    </div>
+    <button class="submit-btn" id="submit-btn" onclick="submitEntry()">Voorspelling opslaan</button>
+    <div class="msg" id="msg"></div>
   </div>
-
-  <div class="section-head">🇧🇪 België – Poule G <div class="sh-line"></div></div>
-  <div class="card">
-    <div class="match-row">
-      <div class="team"><img class="flag-img" src="https://flagcdn.com/w40/be.png" alt="BE">België</div>
-      <div class="score-col">
-        <div class="score-inputs"><input type="number" min="0" max="20" id="be1h"><span class="dash">–</span><input type="number" min="0" max="20" id="be1a"></div>
-        <div class="date-lbl">15 jun</div>
-      </div>
-      <div class="team right"><img class="flag-img" src="https://flagcdn.com/w40/eg.png" alt="EG">Egypte</div>
-    </div>
-    <div class="match-row">
-      <div class="team"><img class="flag-img" src="https://flagcdn.com/w40/be.png" alt="BE">België</div>
-      <div class="score-col">
-        <div class="score-inputs"><input type="number" min="0" max="20" id="be2h"><span class="dash">–</span><input type="number" min="0" max="20" id="be2a"></div>
-        <div class="date-lbl">21 jun</div>
-      </div>
-      <div class="team right"><img class="flag-img" src="https://flagcdn.com/w40/ir.png" alt="IR">Iran</div>
-    </div>
-    <div class="match-row">
-      <div class="team"><img class="flag-img" src="https://flagcdn.com/w40/nz.png" alt="NZ">Nieuw-Zeeland</div>
-      <div class="score-col">
-        <div class="score-inputs"><input type="number" min="0" max="20" id="be3h"><span class="dash">–</span><input type="number" min="0" max="20" id="be3a"></div>
-        <div class="date-lbl">26 jun</div>
-      </div>
-      <div class="team right"><img class="flag-img" src="https://flagcdn.com/w40/be.png" alt="BE">België</div>
-    </div>
-  </div>
-
-  <div class="section-head">🏆 Toernooi <div class="sh-line"></div></div>
-  <div class="card" style="padding:18px 16px">
-    <div class="row2" style="margin-bottom:14px">
-      <div class="field-wrap" style="margin:0">
-        <div class="field-lbl">Winnaar WK</div>
-        <div class="searchable-wrap">
-          <input class="field-input" id="inp-winner" placeholder="Zoek land..." autocomplete="off" readonly onfocus="openDrop('winner')" oninput="filterDrop('winner',this.value)">
-          <input type="hidden" id="val-winner">
-          <div class="drop-list" id="drop-winner"></div>
-        </div>
-      </div>
-      <div class="field-wrap" style="margin:0">
-        <div class="field-lbl">Verliezend finalist</div>
-        <div class="searchable-wrap">
-          <input class="field-input" id="inp-finalist" placeholder="Zoek land..." autocomplete="off" readonly onfocus="openDrop('finalist')" oninput="filterDrop('finalist',this.value)">
-          <input type="hidden" id="val-finalist">
-          <div class="drop-list" id="drop-finalist"></div>
-        </div>
-      </div>
-    </div>
-    <div class="row2" style="margin-bottom:14px">
-      <div class="field-wrap" style="margin:0">
-        <div class="field-lbl">Hoe ver Nederland?</div>
-        <select class="field-input" id="nlver">
-          <option value="">– kies –</option>
-          <option>Groepsfase uit</option><option>1/16 finale</option><option>1/8 finale</option>
-          <option>Kwartfinale</option><option>Halve finale</option><option>Derde plaats</option>
-          <option>Finale (verlies)</option><option>🏆 Wereldkampioen</option>
-        </select>
-      </div>
-      <div class="field-wrap" style="margin:0">
-        <div class="field-lbl">Hoe ver België?</div>
-        <select class="field-input" id="bever">
-          <option value="">– kies –</option>
-          <option>Groepsfase uit</option><option>1/16 finale</option><option>1/8 finale</option>
-          <option>Kwartfinale</option><option>Halve finale</option><option>Derde plaats</option>
-          <option>Finale (verlies)</option><option>🏆 Wereldkampioen</option>
-        </select>
-      </div>
-    </div>
-    <div class="field-wrap" style="margin:0 0 14px">
-      <div class="field-lbl">Topscorer</div>
-      <input type="text" class="field-input" id="topscorer" placeholder="Naam van de topscorer...">
-    </div>
-    <div class="field-wrap" style="margin:0">
-      <div class="field-lbl">Jouw naam</div>
-      <input type="text" class="field-input" id="pname" placeholder="Naam...">
-    </div>
-  </div>
-
-  <button class="submit-btn" id="submit-btn" onclick="submitEntry()">Voorspelling opslaan</button>
-  <div class="msg" id="msg"></div>
 </div>
 
 <!-- OVERZICHT -->
@@ -292,16 +214,44 @@ select.field-input option{background:var(--white)}
   <div class="hero" style="margin-bottom:20px">
     <div class="hero-label">Alle inzendingen</div>
     <div class="hero-title">Overzicht</div>
-    <div class="hero-sub">Bekijk wat iedereen heeft voorspeld.</div>
+    <div class="hero-sub">Bekijk de stand en wat iedereen heeft voorspeld.</div>
   </div>
-  <div class="btn-row">
-    <button class="action-btn" onclick="loadEntries('overzicht')">↻ Vernieuwen</button>
+
+  <!-- Admin: echte uitslagen invoeren -->
+  <div id="admin-scores-panel" style="display:none">
+    <div class="real-scores-card">
+      <div class="real-scores-title">⚙ Echte uitslagen invoeren</div>
+      <div class="real-score-row"><div class="rs-team"><img class="mini-flag" src="https://flagcdn.com/w40/nl.png">NL</div><div class="rs-inputs"><input type="number" min="0" max="20" id="rs-nl1h" placeholder="–"><span class="dash" style="font-size:14px">–</span><input type="number" min="0" max="20" id="rs-nl1a" placeholder="–"></div><div class="rs-team right">JP <img class="mini-flag" src="https://flagcdn.com/w40/jp.png"></div><div class="rs-played"><select id="rs-nl1-played" style="font-size:11px;border:1px solid var(--border2);border-radius:4px;background:var(--bg);padding:2px 4px"><option value="0">Niet gespeeld</option><option value="1">Gespeeld</option></select></div></div>
+      <div class="real-score-row"><div class="rs-team"><img class="mini-flag" src="https://flagcdn.com/w40/nl.png">NL</div><div class="rs-inputs"><input type="number" min="0" max="20" id="rs-nl2h" placeholder="–"><span class="dash" style="font-size:14px">–</span><input type="number" min="0" max="20" id="rs-nl2a" placeholder="–"></div><div class="rs-team right">SE <img class="mini-flag" src="https://flagcdn.com/w40/se.png"></div><div class="rs-played"><select id="rs-nl2-played" style="font-size:11px;border:1px solid var(--border2);border-radius:4px;background:var(--bg);padding:2px 4px"><option value="0">Niet gespeeld</option><option value="1">Gespeeld</option></select></div></div>
+      <div class="real-score-row"><div class="rs-team"><img class="mini-flag" src="https://flagcdn.com/w40/nl.png">NL</div><div class="rs-inputs"><input type="number" min="0" max="20" id="rs-nl3h" placeholder="–"><span class="dash" style="font-size:14px">–</span><input type="number" min="0" max="20" id="rs-nl3a" placeholder="–"></div><div class="rs-team right">TN <img class="mini-flag" src="https://flagcdn.com/w40/tn.png"></div><div class="rs-played"><select id="rs-nl3-played" style="font-size:11px;border:1px solid var(--border2);border-radius:4px;background:var(--bg);padding:2px 4px"><option value="0">Niet gespeeld</option><option value="1">Gespeeld</option></select></div></div>
+      <div class="real-score-row"><div class="rs-team"><img class="mini-flag" src="https://flagcdn.com/w40/be.png">BE</div><div class="rs-inputs"><input type="number" min="0" max="20" id="rs-be1h" placeholder="–"><span class="dash" style="font-size:14px">–</span><input type="number" min="0" max="20" id="rs-be1a" placeholder="–"></div><div class="rs-team right">EG <img class="mini-flag" src="https://flagcdn.com/w40/eg.png"></div><div class="rs-played"><select id="rs-be1-played" style="font-size:11px;border:1px solid var(--border2);border-radius:4px;background:var(--bg);padding:2px 4px"><option value="0">Niet gespeeld</option><option value="1">Gespeeld</option></select></div></div>
+      <div class="real-score-row"><div class="rs-team"><img class="mini-flag" src="https://flagcdn.com/w40/be.png">BE</div><div class="rs-inputs"><input type="number" min="0" max="20" id="rs-be2h" placeholder="–"><span class="dash" style="font-size:14px">–</span><input type="number" min="0" max="20" id="rs-be2a" placeholder="–"></div><div class="rs-team right">IR <img class="mini-flag" src="https://flagcdn.com/w40/ir.png"></div><div class="rs-played"><select id="rs-be2-played" style="font-size:11px;border:1px solid var(--border2);border-radius:4px;background:var(--bg);padding:2px 4px"><option value="0">Niet gespeeld</option><option value="1">Gespeeld</option></select></div></div>
+      <div class="real-score-row"><div class="rs-team"><img class="mini-flag" src="https://flagcdn.com/w40/nz.png">NZ</div><div class="rs-inputs"><input type="number" min="0" max="20" id="rs-be3h" placeholder="–"><span class="dash" style="font-size:14px">–</span><input type="number" min="0" max="20" id="rs-be3a" placeholder="–"></div><div class="rs-team right">BE <img class="mini-flag" src="https://flagcdn.com/w40/be.png"></div><div class="rs-played"><select id="rs-be3-played" style="font-size:11px;border:1px solid var(--border2);border-radius:4px;background:var(--bg);padding:2px 4px"><option value="0">Niet gespeeld</option><option value="1">Gespeeld</option></select></div></div>
+      <div style="margin-top:14px;border-top:1px solid var(--border);padding-top:14px">
+        <div class="real-scores-title" style="margin-bottom:10px">🏆 Toernooi resultaten</div>
+        <div class="row2" style="margin-bottom:10px">
+          <div><div class="field-lbl" style="font-size:11px">Winnaar WK</div><input type="text" class="field-input" id="rs-winnaar" placeholder="Land..." style="font-size:13px;padding:7px 10px"></div>
+          <div><div class="field-lbl" style="font-size:11px">Verliezend finalist</div><input type="text" class="field-input" id="rs-finalist" placeholder="Land..." style="font-size:13px;padding:7px 10px"></div>
+        </div>
+        <div class="row2" style="margin-bottom:10px">
+          <div><div class="field-lbl" style="font-size:11px">Hoe ver NL</div><select class="field-input" id="rs-nlver" style="font-size:13px;padding:7px 10px"><option value="">– nog onbekend –</option><option>Groepsfase uit</option><option>1/16 finale</option><option>1/8 finale</option><option>Kwartfinale</option><option>Halve finale</option><option>Derde plaats</option><option>Finale (verlies)</option><option>🏆 Wereldkampioen</option></select></div>
+          <div><div class="field-lbl" style="font-size:11px">Hoe ver BE</div><select class="field-input" id="rs-bever" style="font-size:13px;padding:7px 10px"><option value="">– nog onbekend –</option><option>Groepsfase uit</option><option>1/16 finale</option><option>1/8 finale</option><option>Kwartfinale</option><option>Halve finale</option><option>Derde plaats</option><option>Finale (verlies)</option><option>🏆 Wereldkampioen</option></select></div>
+        </div>
+        <div><div class="field-lbl" style="font-size:11px">Topscorer</div><input type="text" class="field-input" id="rs-topscorer" placeholder="Naam..." style="font-size:13px;padding:7px 10px"></div>
+      </div>
+      <button class="save-scores-btn" onclick="saveRealScores()">Opslaan & punten herberekenen</button>
+      <div id="rs-msg" style="font-size:12px;margin-top:6px;color:var(--text3)"></div>
+    </div>
   </div>
+
+  <div class="btn-row"><button class="action-btn" onclick="loadEntries('overzicht')">↻ Vernieuwen</button></div>
   <div class="stats-grid">
     <div class="stat-card"><div class="stat-num" id="stat-count">–</div><div class="stat-lbl">Deelnemers</div></div>
     <div class="stat-card"><div class="stat-num" id="stat-winner" style="font-size:18px;line-height:1.3">–</div><div class="stat-lbl">Meest gekozen winnaar</div></div>
     <div class="stat-card"><div class="stat-num" id="stat-scorer" style="font-size:18px;line-height:1.3">–</div><div class="stat-lbl">Meest gekozen topscorer</div></div>
   </div>
+  <!-- Leaderboard -->
+  <div id="leaderboard-wrap"></div>
   <div id="entries-list" class="entries-list"><div class="loading">Laden...</div></div>
 </div>
 
@@ -320,11 +270,18 @@ select.field-input option{background:var(--white)}
 </div>
 
 <script>
-const BIN_NAME='wk2026pool';
+// ── CONFIG ──────────────────────────────────────────────
 const MASTER_KEY='$2a$10$1wdNT85XSfvMgekg/iN2OeBptj3OyeWSTMKf99v04CoIJSjKmTP9O';
+const FD_KEY='e0851cbf247a42899a1fe6854a84390b';
+const ADMIN_PASS='Sjefisdebaas';
+const UNLOCK_DATE=new Date('2026-06-11T00:00:00');
+const DEADLINE=new Date('2026-06-11T00:00:00');
+
 let BIN_ID=localStorage.getItem('jsonbin_bin_id')||'';
 let allEntries=[];
+let realScores=null;
 let charts={};
+let isAdmin=localStorage.getItem('wk_admin')==='1';
 
 const ALL_COUNTRIES=[
   {n:'Algerije',c:'dz'},{n:'Argentinië',c:'ar'},{n:'Australië',c:'au'},{n:'België',c:'be'},
@@ -343,39 +300,29 @@ const ALL_COUNTRIES=[
 ].sort((a,b)=>a.n.localeCompare(b.n,'nl'));
 
 function flagUrl(c){return `https://flagcdn.com/w40/${c}.png`;}
-function flagHtml(c,size){return `<img src="${flagUrl(c)}" style="width:${size||18}px;height:${Math.round((size||18)*0.67)}px;border-radius:2px;object-fit:cover;box-shadow:0 1px 2px rgba(0,0,0,.12)" alt="">`;}
 function countryFlag(name){const ct=ALL_COUNTRIES.find(x=>x.n===name);return ct?flagUrl(ct.c):null;}
+function now(){return new Date();}
+function isUnlocked(){return isAdmin||now()>=UNLOCK_DATE;}
+function isDeadlinePassed(){return now()>=DEADLINE;}
 
-// ── API KEY ──
-function setStatus(msg,type){
-  const el=document.getElementById('api-status-bar');
-  if(!el)return;
-  if(!msg){el.style.display='none';return;}
-  el.style.display='block';
-  el.textContent=msg;
-  el.style.color=type==='err'?'#c0392b':type==='ok'?'#00843D':'#555';
+// ── ADMIN ──
+function promptAdmin(){
+  const p=prompt('Beheerderwachtwoord:');
+  if(p===ADMIN_PASS){
+    isAdmin=true;localStorage.setItem('wk_admin','1');
+    document.getElementById('admin-badge').style.display='inline';
+    unlockNav();
+    alert('✓ Ingelogd als beheerder!');
+  } else if(p!==null){
+    alert('Onjuist wachtwoord.');
+  }
 }
 
-async function initBin(){
-  if(BIN_ID){return;}
-  try{
-    const r=await fetch('https://api.jsonbin.io/v3/b',{method:'POST',headers:{'Content-Type':'application/json','X-Master-Key':MASTER_KEY,'X-Bin-Name':BIN_NAME,'X-Bin-Private':'false'},body:JSON.stringify({entries:[]})});
-    const d=await r.json();
-    if(d.metadata?.id){BIN_ID=d.metadata.id;localStorage.setItem('jsonbin_bin_id',BIN_ID);}
-    else setStatus('Fout bij aanmaken pool: '+JSON.stringify(d),'err');
-  }catch(e){setStatus('Netwerkfout: '+e.message,'err');}
-}
-
-async function readBin(){
-  if(!MASTER_KEY||!BIN_ID)return[];
-  try{const r=await fetch('https://api.jsonbin.io/v3/b/'+BIN_ID+'/latest',{headers:{'X-Master-Key':MASTER_KEY}});const d=await r.json();return d.record?.entries||[];}
-  catch(e){return[];}
-}
-
-async function writeBin(entries){
-  if(!MASTER_KEY||!BIN_ID)return false;
-  try{const r=await fetch('https://api.jsonbin.io/v3/b/'+BIN_ID,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':MASTER_KEY},body:JSON.stringify({entries})});return r.ok;}
-  catch(e){return false;}
+function unlockNav(){
+  ['overzicht','rapport'].forEach(id=>{
+    const btn=document.getElementById('nav-'+id);
+    btn.classList.remove('locked');
+  });
 }
 
 // ── NAV ──
@@ -383,8 +330,69 @@ function goto(page){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('page-'+page).classList.add('active');
-  event.currentTarget.classList.add('active');
-  if(page==='overzicht'||page==='rapport')loadEntries(page);
+  document.getElementById('nav-'+page).classList.add('active');
+  if(page==='overzicht'||page==='rapport') loadEntries(page);
+}
+
+function tryNav(page){
+  if(isUnlocked()) goto(page);
+  else {
+    const days=Math.ceil((UNLOCK_DATE-now())/(1000*60*60*24));
+    alert(`Het overzicht en rapport zijn beschikbaar vanaf 11 juni 2026 (nog ${days} dagen). Ben je de beheerder? Klik op het gouden bolletje rechts.`);
+  }
+}
+
+// ── DEADLINE CHECK ──
+function checkDeadline(){
+  const fc=document.getElementById('form-content');
+  const heroSub=document.getElementById('hero-sub');
+  if(isDeadlinePassed()&&!isAdmin){
+    fc.innerHTML=`<div class="locked-banner"><div class="lock-icon">🔒</div><h2>Pool gesloten</h2><p>De deadline was 11 juni 2026.<br>Het invullen van voorspellingen is niet meer mogelijk.</p></div>`;
+    heroSub.textContent='De pool is gesloten. Het WK is begonnen!';
+  } else if(!isDeadlinePassed()){
+    const diff=DEADLINE-now();
+    const d=Math.floor(diff/(1000*60*60*24));
+    const h=Math.floor((diff%(1000*60*60*24))/(1000*60*60));
+    const fc2=document.getElementById('form-content');
+    if(fc2&&!fc2.querySelector('.deadline-banner')){
+      fc2.insertAdjacentHTML('afterbegin',`<div class="deadline-banner">⏰ Deadline: 11 juni 2026 om middernacht — nog ${d} dag${d!==1?'en':''} en ${h} uur</div>`);
+    }
+  }
+}
+
+// ── JSONBIN ──
+function setStatus(msg,type){
+  const el=document.getElementById('api-status-bar');
+  if(!msg){el.style.display='none';return;}
+  el.style.display='block';el.textContent=msg;
+  el.style.color=type==='err'?'#c0392b':type==='ok'?'#00843D':'#555';
+}
+
+async function initBin(){
+  if(BIN_ID)return;
+  try{
+    const r=await fetch('https://api.jsonbin.io/v3/b',{method:'POST',headers:{'Content-Type':'application/json','X-Master-Key':MASTER_KEY,'X-Bin-Name':'wk2026pool','X-Bin-Private':'false'},body:JSON.stringify({entries:[],realScores:null})});
+    const d=await r.json();
+    if(d.metadata?.id){BIN_ID=d.metadata.id;localStorage.setItem('jsonbin_bin_id',BIN_ID);}
+    else setStatus('Fout: '+JSON.stringify(d),'err');
+  }catch(e){setStatus('Netwerkfout: '+e.message,'err');}
+}
+
+async function readBin(){
+  if(!BIN_ID)return{entries:[],realScores:null};
+  try{
+    const r=await fetch('https://api.jsonbin.io/v3/b/'+BIN_ID+'/latest',{headers:{'X-Master-Key':MASTER_KEY}});
+    const d=await r.json();
+    return{entries:d.record?.entries||[],realScores:d.record?.realScores||null};
+  }catch(e){return{entries:[],realScores:null};}
+}
+
+async function writeBin(data){
+  if(!BIN_ID)return false;
+  try{
+    const r=await fetch('https://api.jsonbin.io/v3/b/'+BIN_ID,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':MASTER_KEY},body:JSON.stringify(data)});
+    return r.ok;
+  }catch(e){return false;}
 }
 
 // ── DROPDOWN ──
@@ -394,8 +402,8 @@ function buildDrop(id,list){
     :'<div class="no-res">Geen resultaten</div>';
 }
 function openDrop(id){document.getElementById('inp-'+id).readOnly=false;buildDrop(id,ALL_COUNTRIES);document.getElementById('drop-'+id).classList.add('open');}
-function filterDrop(id,q){const l=q.toLowerCase();buildDrop(id,ALL_COUNTRIES.filter(ct=>ct.n.toLowerCase().includes(l)));document.getElementById('drop-'+id).classList.add('open');}
-function selectItem(id,name,code){
+function filterDrop(id,q){buildDrop(id,ALL_COUNTRIES.filter(ct=>ct.n.toLowerCase().includes(q.toLowerCase())));document.getElementById('drop-'+id).classList.add('open');}
+function selectItem(id,name){
   document.getElementById('inp-'+id).value=name;document.getElementById('inp-'+id).readOnly=true;
   document.getElementById('val-'+id).value=name;document.getElementById('drop-'+id).classList.remove('open');
 }
@@ -410,7 +418,8 @@ document.addEventListener('click',e=>{
 function gv(id){return document.getElementById(id)?.value?.trim()||'';}
 
 async function submitEntry(){
-  if(!BIN_ID){setStatus('Bezig met verbinden, probeer opnieuw...','err');return;}
+  if(isDeadlinePassed()&&!isAdmin){showMsg('De deadline is verstreken.','err');return;}
+  if(!BIN_ID){showMsg('Bezig met verbinden, probeer opnieuw...','err');return;}
   const name=gv('pname');if(!name){showMsg('Vul je naam in.','err');return;}
   const btn=document.getElementById('submit-btn');btn.disabled=true;btn.textContent='Opslaan...';
   const entry={
@@ -428,15 +437,15 @@ async function submitEntry(){
     winnaar:gv('val-winner')||gv('inp-winner'),finalist:gv('val-finalist')||gv('inp-finalist'),
     topscorer:gv('topscorer'),hoe_ver_nl:gv('nlver'),hoe_ver_be:gv('bever'),
   };
-  const existing=await readBin();existing.push(entry);
-  const ok=await writeBin(existing);
+  const data=await readBin();
+  data.entries.push(entry);
+  const ok=await writeBin(data);
   btn.disabled=false;btn.textContent='Voorspelling opslaan';
   if(ok){showMsg('✓ Opgeslagen! Bedankt.','ok');clearForm();}
-  else showMsg('Fout bij opslaan. Controleer je API key.','err');
+  else showMsg('Fout bij opslaan. Probeer opnieuw.','err');
 }
 
 function showMsg(m,t){const el=document.getElementById('msg');el.textContent=m;el.className='msg'+(t?' '+t:'');if(t==='ok')setTimeout(()=>el.textContent='',4000);}
-
 function clearForm(){
   ['pname','topscorer'].forEach(id=>document.getElementById(id).value='');
   ['nl1h','nl1a','nl2h','nl2a','nl3h','nl3a','be1h','be1a','be2h','be2a','be3h','be3a'].forEach(id=>document.getElementById(id).value='');
@@ -444,16 +453,91 @@ function clearForm(){
   ['winner','finalist'].forEach(id=>{document.getElementById('inp-'+id).value='';document.getElementById('val-'+id).value='';document.getElementById('inp-'+id).readOnly=true;});
 }
 
+// ── PUNTEN ──
+function calcMatchPoints(pred_h, pred_a, real_h, real_a){
+  if(real_h===''||real_a===''||pred_h===''||pred_a==='') return 0;
+  const ph=parseInt(pred_h),pa=parseInt(pred_a),rh=parseInt(real_h),ra=parseInt(real_a);
+  if(isNaN(ph)||isNaN(pa)||isNaN(rh)||isNaN(ra)) return 0;
+  if(ph===rh&&pa===ra) return 5; // exact
+  const predWin=ph>pa?1:ph<pa?-1:0;
+  const realWin=rh>ra?1:rh<ra?-1:0;
+  if(predWin===realWin) return 2; // juiste winnaar
+  return 0;
+}
+
+function calcEntryPoints(entry, rs){
+  if(!rs) return null;
+  let pts=0;
+  const details={matches:[],bonus:[]};
+  // NL wedstrijden
+  const nlKeys=[['rs-nl1h','rs-nl1a'],['rs-nl2h','rs-nl2a'],['rs-nl3h','rs-nl3a']];
+  entry.nl.forEach((m,i)=>{
+    const played=rs['nl'+(i+1)+'-played']==='1';
+    if(!played){details.matches.push({label:m.wedstrijd,pts:null,played:false});return;}
+    const p=calcMatchPoints(m.thuis,m.uit,rs['nl'+(i+1)+'h'],rs['nl'+(i+1)+'a']);
+    pts+=p;details.matches.push({label:m.wedstrijd,pred:`${m.thuis||'?'}–${m.uit||'?'}`,real:`${rs['nl'+(i+1)+'h']}–${rs['nl'+(i+1)+'a']}`,pts,played:true,p});
+  });
+  entry.be.forEach((m,i)=>{
+    const played=rs['be'+(i+1)+'-played']==='1';
+    if(!played){details.matches.push({label:m.wedstrijd,pts:null,played:false});return;}
+    const p=calcMatchPoints(m.thuis,m.uit,rs['be'+(i+1)+'h'],rs['be'+(i+1)+'a']);
+    pts+=p;details.matches.push({label:m.wedstrijd,pred:`${m.thuis||'?'}–${m.uit||'?'}`,real:`${rs['be'+(i+1)+'h']}–${rs['be'+(i+1)+'a']}`,pts,played:true,p});
+  });
+  // Bonus
+  if(rs.winnaar&&entry.winnaar){if(entry.winnaar===rs.winnaar){pts+=20;details.bonus.push({label:'Winnaar WK',pts:20,ok:true});}else details.bonus.push({label:'Winnaar WK',pts:0,ok:false});}
+  if(rs.finalist&&entry.finalist){if(entry.finalist===rs.finalist){pts+=8;details.bonus.push({label:'Verliezend finalist',pts:8,ok:true});}else details.bonus.push({label:'Verliezend finalist',pts:0,ok:false});}
+  if(rs.nlver&&entry.hoe_ver_nl){if(entry.hoe_ver_nl===rs.nlver){pts+=5;details.bonus.push({label:'Hoe ver NL',pts:5,ok:true});}else details.bonus.push({label:'Hoe ver NL',pts:0,ok:false});}
+  if(rs.bever&&entry.hoe_ver_be){if(entry.hoe_ver_be===rs.bever){pts+=5;details.bonus.push({label:'Hoe ver BE',pts:5,ok:true});}else details.bonus.push({label:'Hoe ver BE',pts:0,ok:false});}
+  if(rs.topscorer&&entry.topscorer){if(entry.topscorer.toLowerCase()===rs.topscorer.toLowerCase()){pts+=8;details.bonus.push({label:'Topscorer',pts:8,ok:true});}else details.bonus.push({label:'Topscorer',pts:0,ok:false});}
+  return{pts,details};
+}
+
+// ── REAL SCORES ──
+async function saveRealScores(){
+  const rs={
+    nl1h:gv('rs-nl1h'),nl1a:gv('rs-nl1a'),'nl1-played':document.getElementById('rs-nl1-played').value,
+    nl2h:gv('rs-nl2h'),nl2a:gv('rs-nl2a'),'nl2-played':document.getElementById('rs-nl2-played').value,
+    nl3h:gv('rs-nl3h'),nl3a:gv('rs-nl3a'),'nl3-played':document.getElementById('rs-nl3-played').value,
+    be1h:gv('rs-be1h'),be1a:gv('rs-be1a'),'be1-played':document.getElementById('rs-be1-played').value,
+    be2h:gv('rs-be2h'),be2a:gv('rs-be2a'),'be2-played':document.getElementById('rs-be2-played').value,
+    be3h:gv('rs-be3h'),be3a:gv('rs-be3a'),'be3-played':document.getElementById('rs-be3-played').value,
+    winnaar:gv('rs-winnaar'),finalist:gv('rs-finalist'),
+    nlver:gv('rs-nlver'),bever:gv('rs-bever'),topscorer:gv('rs-topscorer'),
+  };
+  const data=await readBin();
+  data.realScores=rs;
+  const ok=await writeBin(data);
+  const msg=document.getElementById('rs-msg');
+  msg.textContent=ok?'✓ Opgeslagen en punten herberekend!':'Fout bij opslaan.';
+  msg.style.color=ok?'var(--green)':'var(--accent2)';
+  if(ok){realScores=rs;renderOverview();}
+}
+
+function loadRealScores(rs){
+  if(!rs)return;
+  ['nl1h','nl1a','nl2h','nl2a','nl3h','nl3a','be1h','be1a','be2h','be2a','be3h','be3a'].forEach(k=>{
+    const el=document.getElementById('rs-'+k);if(el&&rs[k]!==undefined)el.value=rs[k];
+  });
+  ['nl1','nl2','nl3','be1','be2','be3'].forEach(k=>{
+    const el=document.getElementById('rs-'+k+'-played');if(el&&rs[k+'-played'])el.value=rs[k+'-played'];
+  });
+  ['winnaar','finalist','nlver','bever','topscorer'].forEach(k=>{
+    const el=document.getElementById('rs-'+k);if(el&&rs[k])el.value=rs[k];
+  });
+}
+
 // ── LOAD ──
 async function loadEntries(target){
   if(!BIN_ID){
-    const msg='<div class="empty-state"><div class="big">⏳</div><p style="margin-top:12px">Even geduld, verbinding wordt gemaakt...</p></div>';
-    if(target==='overzicht')document.getElementById('entries-list').innerHTML=msg;
-    if(target==='rapport')document.getElementById('charts-wrap').innerHTML=msg;
-    setTimeout(()=>loadEntries(target),1500);
-    return;
+    setTimeout(()=>loadEntries(target),1500);return;
   }
-  allEntries=await readBin();
+  const data=await readBin();
+  allEntries=data.entries;
+  realScores=data.realScores;
+  if(isAdmin&&target==='overzicht'){
+    document.getElementById('admin-scores-panel').style.display='block';
+    loadRealScores(realScores);
+  }
   if(target==='overzicht')renderOverview();
   if(target==='rapport')renderCharts();
 }
@@ -463,30 +547,56 @@ function topPick(arr){const f=arr.filter(Boolean);if(!f.length)return'–';const
 
 function renderOverview(){
   document.getElementById('stat-count').textContent=allEntries.length;
-  const topW=topPick(allEntries.map(e=>e.winnaar));
-  const topS=topPick(allEntries.map(e=>e.topscorer));
-  document.getElementById('stat-winner').textContent=topW;
-  document.getElementById('stat-scorer').textContent=topS;
+  document.getElementById('stat-winner').textContent=topPick(allEntries.map(e=>e.winnaar));
+  document.getElementById('stat-scorer').textContent=topPick(allEntries.map(e=>e.topscorer));
+
+  // Leaderboard
+  const lbWrap=document.getElementById('leaderboard-wrap');
+  const scored=allEntries.map(e=>({naam:e.naam,result:calcEntryPoints(e,realScores)})).filter(e=>e.result!==null).sort((a,b)=>b.result.pts-a.result.pts);
+  if(scored.length){
+    lbWrap.innerHTML=`<div class="section-head" style="margin-top:0">🏅 Stand <div class="sh-line"></div></div>
+    <div class="leaderboard">${scored.map((e,i)=>`
+      <div class="lb-row${i===0?' lb-first':''}">
+        <div class="lb-rank${i===0?' gold':''}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</div>
+        <div class="lb-name">${e.naam}</div>
+        <div class="lb-pts">${e.result.pts}<span>pt</span></div>
+      </div>`).join('')}
+    </div>`;
+  } else lbWrap.innerHTML='';
+
   const list=document.getElementById('entries-list');
   if(!allEntries.length){list.innerHTML='<div class="empty-state"><div class="big">0</div><p style="margin-top:12px">Nog geen voorspellingen.</p></div>';return;}
 
-  const NL_OPPS=[{c:'jp',n:'Japan'},{c:'se',n:'Zweden'},{c:'tn',n:'Tunesië'}];
-  const BE_OPPS=[{c:'eg',n:'Egypte'},{c:'ir',n:'Iran'},{c:'nz',n:'Nieuw-Zeeland'}];
+  const NL_OPPS=[{c:'jp'},{c:'se'},{c:'tn'}];
+  const BE_OPPS=[{c:'eg'},{c:'ir'},{c:'be'}];
+  const NZ={c:'nz'};
 
   list.innerHTML=[...allEntries].reverse().map(e=>{
+    const result=calcEntryPoints(e,realScores);
     const wFlag=countryFlag(e.winnaar);const fFlag=countryFlag(e.finalist);
     return`<div class="entry-card">
       <div class="entry-card-header">
         <div class="entry-name">${e.naam}</div>
-        <div class="entry-date">${new Date(e.tijdstip).toLocaleDateString('nl-NL',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          ${result?`<div class="entry-points">${result.pts} pt</div>`:''}
+          <div class="entry-date">${new Date(e.tijdstip).toLocaleDateString('nl-NL',{day:'numeric',month:'short'})}</div>
+        </div>
       </div>
       <div class="entry-body">
-        <div class="entry-section-lbl"><img src="${flagUrl('nl')}" class="mini-flag"> Nederland – Poule F</div>
-        ${e.nl.map((m,i)=>`<div class="match-mini"><img src="${flagUrl('nl')}" class="mini-flag"><span class="score">${m.thuis||'?'}–${m.uit||'?'}</span><img src="${flagUrl(NL_OPPS[i].c)}" class="mini-flag"><span style="color:var(--text3)">${m.wedstrijd}</span></div>`).join('')}
-        <div class="entry-section-lbl" style="margin-top:12px"><img src="${flagUrl('be')}" class="mini-flag"> België – Poule G</div>
+        <div class="entry-section-lbl"><img src="${flagUrl('nl')}" class="mini-flag"> Nederland</div>
+        ${e.nl.map((m,i)=>{
+          const real=realScores&&realScores['nl'+(i+1)+'-played']==='1'?`${realScores['nl'+(i+1)+'h']}–${realScores['nl'+(i+1)+'a']}`:'';
+          const p=real?calcMatchPoints(m.thuis,m.uit,realScores['nl'+(i+1)+'h'],realScores['nl'+(i+1)+'a']):null;
+          const ptsBadge=p===null?'':`<span class="pts ${p===5?'pts-exact':p===2?'pts-winner':'pts-none'}">${p===5?'+5 exact':p===2?'+2 winnaar':'0'}</span>`;
+          return`<div class="match-mini"><img src="${flagUrl('nl')}" class="mini-flag"><span class="score">${m.thuis||'?'}–${m.uit||'?'}</span><img src="${flagUrl(NL_OPPS[i].c)}" class="mini-flag">${real?`<span style="color:var(--text3);font-size:11px">(echt: ${real})</span>`:''}${ptsBadge}</div>`;
+        }).join('')}
+        <div class="entry-section-lbl" style="margin-top:10px"><img src="${flagUrl('be')}" class="mini-flag"> België</div>
         ${e.be.map((m,i)=>{
-          const isNZ=i===2;
-          return`<div class="match-mini">${isNZ?`<img src="${flagUrl('nz')}" class="mini-flag">`:`<img src="${flagUrl('be')}" class="mini-flag">`}<span class="score">${m.thuis||'?'}–${m.uit||'?'}</span>${isNZ?`<img src="${flagUrl('be')}" class="mini-flag">`:BE_OPPS[i]?`<img src="${flagUrl(BE_OPPS[i].c)}" class="mini-flag">`:''}<span style="color:var(--text3)">${m.wedstrijd}</span></div>`;
+          const real=realScores&&realScores['be'+(i+1)+'-played']==='1'?`${realScores['be'+(i+1)+'h']}–${realScores['be'+(i+1)+'a']}`:'';
+          const p=real?calcMatchPoints(m.thuis,m.uit,realScores['be'+(i+1)+'h'],realScores['be'+(i+1)+'a']):null;
+          const ptsBadge=p===null?'':`<span class="pts ${p===5?'pts-exact':p===2?'pts-winner':'pts-none'}">${p===5?'+5 exact':p===2?'+2 winnaar':'0'}</span>`;
+          const homeFlag=i===2?NZ:{c:'be'};const awayFlag=i===2?{c:'be'}:BE_OPPS[i];
+          return`<div class="match-mini"><img src="${flagUrl(homeFlag.c)}" class="mini-flag"><span class="score">${m.thuis||'?'}–${m.uit||'?'}</span><img src="${flagUrl(awayFlag.c)}" class="mini-flag">${real?`<span style="color:var(--text3);font-size:11px">(echt: ${real})</span>`:''}${ptsBadge}</div>`;
         }).join('')}
         <div class="entry-grid">
           <div class="entry-item">Winnaar<strong>${wFlag?`<img src="${wFlag}" style="width:18px;height:12px;border-radius:2px;object-fit:cover">`:''} ${e.winnaar||'–'}</strong></div>
@@ -504,55 +614,42 @@ function renderOverview(){
 function renderCharts(){
   Object.values(charts).forEach(c=>c.destroy());charts={};
   if(!allEntries.length){document.getElementById('charts-wrap').innerHTML='<div class="empty-state"><div class="big">📊</div><p style="margin-top:12px">Nog geen voorspellingen.</p></div>';return;}
-
   const wrap=document.getElementById('charts-wrap');
   wrap.innerHTML=`
     <div class="chart-card"><div class="chart-title">Wie wint het WK?</div><div class="chart-wrap"><canvas id="c-winner"></canvas></div></div>
     <div class="chart-card"><div class="chart-title">Hoe ver komt Nederland?</div><div class="chart-wrap" style="height:220px"><canvas id="c-nl"></canvas></div></div>
     <div class="chart-card"><div class="chart-title">Hoe ver komt België?</div><div class="chart-wrap" style="height:220px"><canvas id="c-be"></canvas></div></div>
     <div class="chart-card"><div class="chart-title">Topscorer voorspellingen</div><div class="chart-wrap"><canvas id="c-scorer"></canvas></div></div>
-    <div class="chart-card"><div class="chart-title">Gemiddeld verwacht aantal doelpunten NL</div><div class="chart-wrap" style="height:200px"><canvas id="c-goals"></canvas></div></div>`;
-
+    <div class="chart-card"><div class="chart-title">Stand (punten)</div><div class="chart-wrap" style="height:220px"><canvas id="c-stand"></canvas></div></div>`;
   const COLS=['#0033A0','#E8192C','#F5C800','#00843D','#C6007E','#0066CC','#FF6600','#663399'];
-
-  function pieChart(id,data){
-    const freq={};data.filter(Boolean).forEach(v=>{freq[v]=(freq[v]||0)+1;});
-    const sorted=Object.entries(freq).sort((a,b)=>b[1]-a[1]);
-    charts[id]=new Chart(document.getElementById(id),{type:'doughnut',data:{labels:sorted.map(e=>e[0]),datasets:[{data:sorted.map(e=>e[1]),backgroundColor:COLS.slice(0,sorted.length),borderWidth:0,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#555550',font:{family:'Barlow',size:12},padding:14,boxWidth:14}}},cutout:'58%'}});
-  }
-
-  function barChart(id,labels,data,horizontal){
-    charts[id]=new Chart(document.getElementById(id),{type:'bar',data:{labels,datasets:[{data,backgroundColor:'#0033A0',borderRadius:5,borderSkipped:false,hoverBackgroundColor:'#E8192C'}]},options:{indexAxis:horizontal?'y':'x',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#999892',font:{family:'Barlow',size:12}},grid:{color:'#E2DDD6'}},y:{ticks:{color:'#999892',font:{family:'Barlow',size:12},precision:0},grid:{color:'#E2DDD6'}}}}});
-  }
-
+  function pieChart(id,data){const freq={};data.filter(Boolean).forEach(v=>{freq[v]=(freq[v]||0)+1;});const sorted=Object.entries(freq).sort((a,b)=>b[1]-a[1]);charts[id]=new Chart(document.getElementById(id),{type:'doughnut',data:{labels:sorted.map(e=>e[0]),datasets:[{data:sorted.map(e=>e[1]),backgroundColor:COLS.slice(0,sorted.length),borderWidth:0,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#555550',font:{family:'Barlow',size:12},padding:14,boxWidth:14}}},cutout:'58%'}});}
+  function barChart(id,labels,data,horizontal){charts[id]=new Chart(document.getElementById(id),{type:'bar',data:{labels,datasets:[{data,backgroundColor:'#0033A0',borderRadius:5,borderSkipped:false,hoverBackgroundColor:'#E8192C'}]},options:{indexAxis:horizontal?'y':'x',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#999892',font:{family:'Barlow',size:12}},grid:{color:'#E2DDD6'}},y:{ticks:{color:'#999892',font:{family:'Barlow',size:12},precision:0},grid:{color:'#E2DDD6'}}}}});}
   pieChart('c-winner',allEntries.map(e=>e.winnaar));
-
   const rounds=['Groepsfase uit','1/16 finale','1/8 finale','Kwartfinale','Halve finale','Derde plaats','Finale (verlies)','🏆 Wereldkampioen'];
-  function roundBar(field,id){
-    const freq={};allEntries.forEach(e=>{if(e[field])freq[e[field]]=(freq[e[field]]||0)+1;});
-    const lbls=rounds.filter(r=>freq[r]);barChart(id,lbls,lbls.map(l=>freq[l]||0),false);
-  }
+  function roundBar(field,id){const freq={};allEntries.forEach(e=>{if(e[field])freq[e[field]]=(freq[e[field]]||0)+1;});const lbls=rounds.filter(r=>freq[r]);barChart(id,lbls,lbls.map(l=>freq[l]||0),false);}
   roundBar('hoe_ver_nl','c-nl');roundBar('hoe_ver_be','c-be');
-
   const sf={};allEntries.forEach(e=>{if(e.topscorer)sf[e.topscorer]=(sf[e.topscorer]||0)+1;});
   const top=Object.entries(sf).sort((a,b)=>b[1]-a[1]).slice(0,8);
   barChart('c-scorer',top.map(e=>e[0]),top.map(e=>e[1]),true);
-
-  const nlAvgFor=[0,1,2].map(i=>{const v=allEntries.map(e=>parseInt(e.nl[i].thuis)).filter(v=>!isNaN(v));return v.length?+(v.reduce((a,b)=>a+b,0)/v.length).toFixed(1):0;});
-  const nlAvgAg=[0,1,2].map(i=>{const v=allEntries.map(e=>parseInt(e.nl[i].uit)).filter(v=>!isNaN(v));return v.length?+(v.reduce((a,b)=>a+b,0)/v.length).toFixed(1):0;});
-  charts['c-goals']=new Chart(document.getElementById('c-goals'),{type:'bar',data:{labels:['vs Japan','vs Zweden','vs Tunesië'],datasets:[{label:'NL scoort (gem)',data:nlAvgFor,backgroundColor:'#0033A0',borderRadius:4,borderSkipped:false},{label:'Tegenscoort (gem)',data:nlAvgAg,backgroundColor:'#E8192C',borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#555550',font:{family:'Barlow',size:12}}}},scales:{x:{ticks:{color:'#999892'},grid:{color:'#E2DDD6'}},y:{ticks:{color:'#999892',stepSize:0.5},grid:{color:'#E2DDD6'}}}}});
+  const scored=allEntries.map(e=>({naam:e.naam,pts:(calcEntryPoints(e,realScores)||{pts:0}).pts})).sort((a,b)=>b.pts-a.pts);
+  barChart('c-stand',scored.map(e=>e.naam),scored.map(e=>e.pts),true);
 }
 
 // ── CSV ──
 function exportCSV(){
   if(!allEntries.length){alert('Nog geen data.');return;}
-  const h=['Naam','Tijdstip','NL-Japan_NL','NL-Japan_JP','NL-Zweden_NL','NL-Zweden_SE','NL-Tunesie_NL','NL-Tunesie_TN','BE-Egypte_BE','BE-Egypte_EG','BE-Iran_BE','BE-Iran_IR','NZ-Belgie_NZ','NZ-Belgie_BE','Winnaar','Finalist','Topscorer','HoeverNL','HoeverBE'];
-  const rows=allEntries.map(e=>[e.naam,e.tijdstip,e.nl[0].thuis,e.nl[0].uit,e.nl[1].thuis,e.nl[1].uit,e.nl[2].thuis,e.nl[2].uit,e.be[0].thuis,e.be[0].uit,e.be[1].thuis,e.be[1].uit,e.be[2].thuis,e.be[2].uit,e.winnaar,e.finalist,e.topscorer,e.hoe_ver_nl,e.hoe_ver_be].map(v=>`"${(v||'').replace(/"/g,'""')}"`));
+  const h=['Naam','Tijdstip','NL-Japan_NL','NL-Japan_JP','NL-Zweden_NL','NL-Zweden_SE','NL-Tunesie_NL','NL-Tunesie_TN','BE-Egypte_BE','BE-Egypte_EG','BE-Iran_BE','BE-Iran_IR','NZ-Belgie_NZ','NZ-Belgie_BE','Winnaar','Finalist','Topscorer','HoeverNL','HoeverBE','Punten'];
+  const rows=allEntries.map(e=>{const r=calcEntryPoints(e,realScores);return[e.naam,e.tijdstip,e.nl[0].thuis,e.nl[0].uit,e.nl[1].thuis,e.nl[1].uit,e.nl[2].thuis,e.nl[2].uit,e.be[0].thuis,e.be[0].uit,e.be[1].thuis,e.be[1].uit,e.be[2].thuis,e.be[2].uit,e.winnaar,e.finalist,e.topscorer,e.hoe_ver_nl,e.hoe_ver_be,r?r.pts:''].map(v=>`"${(v===undefined||v===null?'':String(v)).replace(/"/g,'""')}"`)});
   const csv=[h.join(','),...rows.map(r=>r.join(','))].join('\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'}));a.download='wk2026_pool.csv';a.click();
 }
 
 // ── INIT ──
+if(isAdmin){
+  document.getElementById('admin-badge').style.display='inline';
+  unlockNav();
+}
+checkDeadline();
 initBin();
 </script>
 </body>
