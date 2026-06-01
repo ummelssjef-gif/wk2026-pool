@@ -302,7 +302,7 @@ const ALL_COUNTRIES=[
 ].sort((a,b)=>a.n.localeCompare(b.n,'nl'));
 
 function flagUrl(c){return `https://flagcdn.com/w40/${c}.png`;}
-function countryFlag(name){const ct=ALL_COUNTRIES.find(x=>x.n===name);return ct?flagUrl(ct.c):null;}
+function countryFlag(name){const ct=ALL_COUNTRIES.find(x=>x.n===name);return ct?`https://flagcdn.com/w160/${ct.c}.png`:null;}
 function now(){return new Date();}
 function isUnlocked(){return isAdmin||now()>=UNLOCK_DATE;}
 function isDeadlinePassed(){return now()>=DEADLINE;}
@@ -687,20 +687,23 @@ function renderOverview(){
 // ── CHARTS ──
 // ── WIKIPEDIA PHOTO LOOKUP ──
 const WIKI_PHOTOS = {
-  'Kylian Mbappé': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Kylian_Mbapp%C3%A9_in_2019.jpg/120px-Kylian_Mbapp%C3%A9_in_2019.jpg',
-  'Harry Kane': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Harry_Kane_vs_Hungary_%28cropped%29.jpg/120px-Harry_Kane_vs_Hungary_%28cropped%29.jpg',
+  'Kylian Mbappé': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Kylian_Mbappe_2018.jpg/120px-Kylian_Mbappe_2018.jpg',
+  'Harry Kane': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Harry_Kane_2020.jpg/120px-Harry_Kane_2020.jpg',
   'Cristiano Ronaldo': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Cristiano_Ronaldo_2018.jpg/120px-Cristiano_Ronaldo_2018.jpg',
-  'Erling Haaland': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Erling_Haaland_2023.jpg/120px-Erling_Haaland_2023.jpg',
+  'Erling Haaland': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Erling_Haaland_in_2022_%28cropped%29.jpg/120px-Erling_Haaland_in_2022_%28cropped%29.jpg',
   'Lionel Messi': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Lionel-Messi-Argentina-2022-FIFA-World-Cup_%28cropped%29.jpg/120px-Lionel-Messi-Argentina-2022-FIFA-World-Cup_%28cropped%29.jpg',
-  'Neymar Jr.': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Bra-Cos_Richarlison_goal_%28cropped%29_Neymar.jpg/120px-Bra-Cos_Richarlison_goal_%28cropped%29_Neymar.jpg',
-  'Robert Lewandowski': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/2019_FIFA_Women%27s_World_Cup_Final_%2848244168041%29_%28cropped%29.jpg/120px-2019_FIFA_Women%27s_World_Cup_Final_%2848244168041%29_%28cropped%29.jpg',
-  'Mohamed Salah': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Mohamed_Salah_2018.jpg/120px-Mohamed_Salah_2018.jpg',
-  'Vinícius Júnior': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Vinicius_Junior_2023.jpg/120px-Vinicius_Junior_2023.jpg',
-  'Jude Bellingham': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Jude_Bellingham_2023.jpg/120px-Jude_Bellingham_2023.jpg',
-  'Lamine Yamal': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Lamine_Yamal_2024.jpg/120px-Lamine_Yamal_2024.jpg',
-  'Kevin De Bruyne': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Kevin_De_Bruyne_2021.jpg/120px-Kevin_De_Bruyne_2021.jpg',
-  'Memphis Depay': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Memphis_Depay_2022.jpg/120px-Memphis_Depay_2022.jpg',
-  'Cody Gakpo': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Cody_Gakpo_2023.jpg/120px-Cody_Gakpo_2023.jpg',
+  'Neymar Jr.': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Neymar_-_2018_%28cropped%29.jpg/120px-Neymar_-_2018_%28cropped%29.jpg',
+  'Robert Lewandowski': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Robert_Lewandowski_%28cropped%2C_2%29.jpg/120px-Robert_Lewandowski_%28cropped%2C_2%29.jpg',
+  'Mohamed Salah': 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Mohamed_Salah_2022_%28cropped%29.jpg/120px-Mohamed_Salah_2022_%28cropped%29.jpg',
+  'Vinícius Júnior': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Vinicius_Jr_%28cropped%29.jpg/120px-Vinicius_Jr_%28cropped%29.jpg',
+  'Jude Bellingham': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Jude_Bellingham_2022_%28cropped%29.jpg/120px-Jude_Bellingham_2022_%28cropped%29.jpg',
+  'Lamine Yamal': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Lamine_Yamal_2024_%28cropped%29.jpg/120px-Lamine_Yamal_2024_%28cropped%29.jpg',
+  'Kevin De Bruyne': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Kevin_De_Bruyne_2022_%28cropped%29.jpg/120px-Kevin_De_Bruyne_2022_%28cropped%29.jpg',
+  'Memphis Depay': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Memphis_Depay_2021_%28cropped%29.jpg/120px-Memphis_Depay_2021_%28cropped%29.jpg',
+  'Cody Gakpo': 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Cody_Gakpo_2022_%28cropped%29.jpg/120px-Cody_Gakpo_2022_%28cropped%29.jpg',
+  'Virgil van Dijk': 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Virgil_van_Dijk_2022_%28cropped%29.jpg/120px-Virgil_van_Dijk_2022_%28cropped%29.jpg',
+  'Romelu Lukaku': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Romelu_Lukaku_2022_%28cropped%29.jpg/120px-Romelu_Lukaku_2022_%28cropped%29.jpg',
+  'Karim Benzema': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Karim_Benzema_2022_%28cropped%29.jpg/120px-Karim_Benzema_2022_%28cropped%29.jpg',
 };
 
 function playerPhoto(name){
@@ -716,11 +719,11 @@ function customBarChart(containerId, items, getLabel, getValue, getImageUrl){
     const val = getValue(item);
     const pct = Math.round((val / max) * 100);
     const imgUrl = getImageUrl(item);
-    const imgHtml = imgUrl
-      ? `<div style="position:absolute;right:-20px;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;overflow:hidden;border:2px solid var(--white);box-shadow:0 1px 4px rgba(0,0,0,.2);background:var(--border);flex-shrink:0">
-           <img src="${imgUrl}" style="width:100%;height:100%;object-fit:cover;object-position:top" onerror="this.parentNode.style.background='#ddd';this.remove()">
-         </div>`
-      : '';
+    const initials = label.split(' ').map(w=>w[0]).filter(Boolean).slice(0,2).join('').toUpperCase();
+    const imgHtml = `<div style="position:absolute;right:-20px;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;overflow:hidden;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.2);background:#CCC8BF;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#555;font-family:'Barlow',sans-serif" id="avatar-${label.replace(/[^a-zA-Z]/g,'_')}">
+      ${imgUrl ? `<img src="${imgUrl}" style="width:100%;height:100%;object-fit:cover;object-position:top;position:absolute;inset:0" onerror="this.remove()">` : ''}
+      <span style="position:relative;z-index:0">${initials}</span>
+    </div>`;
     return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
       <div style="font-size:12px;color:#555550;width:130px;text-align:right;flex-shrink:0;font-family:'Barlow',sans-serif">${label}</div>
       <div style="flex:1;height:36px;background:#F0EDE8;border-radius:6px;position:relative;padding-right:26px">
@@ -753,7 +756,7 @@ function renderCharts(){
   customBarChart('c-winner-custom', winItems,
     item=>item.name,
     item=>item.count,
-    item=>{const ct=ALL_COUNTRIES.find(x=>x.n===item.name);return ct?flagUrl(ct.c):null;}
+    item=>{const ct=ALL_COUNTRIES.find(x=>x.n===item.name);return ct?`https://flagcdn.com/w160/${ct.c}.png`:null;}
   );
 
   // NL/BE ronde
