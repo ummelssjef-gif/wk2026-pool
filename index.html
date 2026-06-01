@@ -486,7 +486,7 @@ function calcEntryPoints(entry, rs){
   if(rs.finalist&&entry.finalist){if(entry.finalist===rs.finalist){pts+=8;details.bonus.push({label:'Verliezend finalist',pts:8,ok:true});}else details.bonus.push({label:'Verliezend finalist',pts:0,ok:false});}
   if(rs.nlver&&entry.hoe_ver_nl){if(entry.hoe_ver_nl===rs.nlver){pts+=5;details.bonus.push({label:'Hoe ver NL',pts:5,ok:true});}else details.bonus.push({label:'Hoe ver NL',pts:0,ok:false});}
   if(rs.bever&&entry.hoe_ver_be){if(entry.hoe_ver_be===rs.bever){pts+=5;details.bonus.push({label:'Hoe ver BE',pts:5,ok:true});}else details.bonus.push({label:'Hoe ver BE',pts:0,ok:false});}
-  if(rs.topscorer&&entry.topscorer){if(fuzzyMatch(entry.topscorer,rs.topscorer)){pts+=8;details.bonus.push({label:'Topscorer',pts:8,ok:true});}else details.bonus.push({label:'Topscorer',pts:0,ok:false});}
+  if(rs.topscorer&&entry.topscorer){if(fuzzyMatch(canonicalPlayer(entry.topscorer),canonicalPlayer(rs.topscorer))){pts+=8;details.bonus.push({label:'Topscorer',pts:8,ok:true});}else details.bonus.push({label:'Topscorer',pts:0,ok:false});}
   return{pts,details};
 }
 
@@ -541,6 +541,52 @@ async function loadEntries(target){
 }
 
 // ── FUZZY NAME MATCH ──
+// Spelerswoordenboek — normaliseert varianten naar officiële naam
+const PLAYER_ALIASES = {
+  'kane': 'Harry Kane',
+  'harry kane': 'Harry Kane',
+  'mbappe': 'Kylian Mbappé',
+  'mbappe kylian': 'Kylian Mbappé',
+  'kylian mbappe': 'Kylian Mbappé',
+  'kylian mbappe': 'Kylian Mbappé',
+  'mbappé': 'Kylian Mbappé',
+  'christiano ronaldo': 'Cristiano Ronaldo',
+  'cristiano ronaldo': 'Cristiano Ronaldo',
+  'ronaldo': 'Cristiano Ronaldo',
+  'cr7': 'Cristiano Ronaldo',
+  'neymar': 'Neymar Jr.',
+  'neymar jr': 'Neymar Jr.',
+  'salah': 'Mohamed Salah',
+  'mo salah': 'Mohamed Salah',
+  'lewandowski': 'Robert Lewandowski',
+  'lewa': 'Robert Lewandowski',
+  'benzema': 'Karim Benzema',
+  'haaland': 'Erling Haaland',
+  'de bruyne': 'Kevin De Bruyne',
+  'kevin de bruyne': 'Kevin De Bruyne',
+  'lukaku': 'Romelu Lukaku',
+  'depay': 'Memphis Depay',
+  'memphis': 'Memphis Depay',
+  'virgil': 'Virgil van Dijk',
+  'van dijk': 'Virgil van Dijk',
+  'dumfries': 'Denzel Dumfries',
+  'gakpo': 'Cody Gakpo',
+  'bellingham': 'Jude Bellingham',
+  'vinicius': 'Vinícius Júnior',
+  'vinicius jr': 'Vinícius Júnior',
+  'pedri': 'Pedri',
+  'yamal': 'Lamine Yamal',
+  'lamine yamal': 'Lamine Yamal',
+  'modric': 'Luka Modrić',
+  'luka modric': 'Luka Modrić',
+};
+
+function canonicalPlayer(s){
+  if(!s)return s;
+  const key = s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,' ').replace(/\s+/g,' ').trim();
+  return PLAYER_ALIASES[key] || s;
+}
+
 function normalizeName(s){
   if(!s)return'';
   return s.toLowerCase()
@@ -550,7 +596,9 @@ function normalizeName(s){
 }
 function fuzzyMatch(a,b){
   if(!a||!b)return false;
-  const na=normalizeName(a),nb=normalizeName(b);
+  // Normaliseer via woordenboek eerst
+  const ca=canonicalPlayer(a),cb=canonicalPlayer(b);
+  const na=normalizeName(ca),nb=normalizeName(cb);
   if(na===nb)return true;
   const wa=na.split(' '),wb=nb.split(' ');
   const shorter=wa.length<=wb.length?wa:wb;
@@ -560,7 +608,7 @@ function fuzzyMatch(a,b){
 
 // ── OVERVIEW ──
 function topPick(arr){
-  const f=arr.filter(Boolean);
+  const f=arr.filter(Boolean).map(canonicalPlayer);
   if(!f.length)return'–';
   const groups=[];
   f.forEach(v=>{
@@ -658,9 +706,10 @@ function renderCharts(){
   const sfGroups=[];
   allEntries.forEach(e=>{
     if(!e.topscorer)return;
-    const g=sfGroups.find(g=>fuzzyMatch(g.canonical,e.topscorer));
-    if(g){g.count++;if(e.topscorer.length>g.canonical.length)g.canonical=e.topscorer;}
-    else sfGroups.push({canonical:e.topscorer,count:1});
+    const ts=canonicalPlayer(e.topscorer);
+    const g=sfGroups.find(g=>fuzzyMatch(g.canonical,ts));
+    if(g){g.count++;if(ts.length>g.canonical.length)g.canonical=ts;}
+    else sfGroups.push({canonical:ts,count:1});
   });
   const top=sfGroups.sort((a,b)=>b.count-a.count).slice(0,8);
   barChart('c-scorer',top.map(e=>e.canonical),top.map(e=>e.count),true);
@@ -693,7 +742,7 @@ function renderTopscorersWidgets(){
   if(wrap.innerHTML.trim()) return; // al geladen
 
   // Haal unieke topscorers op uit pool (fuzzy gegroepeerd)
-  const poolNames = allEntries.map(e=>e.topscorer).filter(Boolean);
+  const poolNames = allEntries.map(e=>canonicalPlayer(e.topscorer)).filter(Boolean);
   const groups = [];
   poolNames.forEach(v=>{
     const g = groups.find(g=>fuzzyMatch(g.canonical, v));
