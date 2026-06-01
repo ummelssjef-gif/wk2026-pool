@@ -685,24 +685,83 @@ function renderOverview(){
 }
 
 // ── CHARTS ──
+// ── WIKIPEDIA PHOTO LOOKUP ──
+const WIKI_PHOTOS = {
+  'Kylian Mbappé': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Kylian_Mbapp%C3%A9_in_2019.jpg/120px-Kylian_Mbapp%C3%A9_in_2019.jpg',
+  'Harry Kane': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Harry_Kane_vs_Hungary_%28cropped%29.jpg/120px-Harry_Kane_vs_Hungary_%28cropped%29.jpg',
+  'Cristiano Ronaldo': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Cristiano_Ronaldo_2018.jpg/120px-Cristiano_Ronaldo_2018.jpg',
+  'Erling Haaland': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Erling_Haaland_2023.jpg/120px-Erling_Haaland_2023.jpg',
+  'Lionel Messi': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Lionel-Messi-Argentina-2022-FIFA-World-Cup_%28cropped%29.jpg/120px-Lionel-Messi-Argentina-2022-FIFA-World-Cup_%28cropped%29.jpg',
+  'Neymar Jr.': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Bra-Cos_Richarlison_goal_%28cropped%29_Neymar.jpg/120px-Bra-Cos_Richarlison_goal_%28cropped%29_Neymar.jpg',
+  'Robert Lewandowski': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/2019_FIFA_Women%27s_World_Cup_Final_%2848244168041%29_%28cropped%29.jpg/120px-2019_FIFA_Women%27s_World_Cup_Final_%2848244168041%29_%28cropped%29.jpg',
+  'Mohamed Salah': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Mohamed_Salah_2018.jpg/120px-Mohamed_Salah_2018.jpg',
+  'Vinícius Júnior': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Vinicius_Junior_2023.jpg/120px-Vinicius_Junior_2023.jpg',
+  'Jude Bellingham': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Jude_Bellingham_2023.jpg/120px-Jude_Bellingham_2023.jpg',
+  'Lamine Yamal': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Lamine_Yamal_2024.jpg/120px-Lamine_Yamal_2024.jpg',
+  'Kevin De Bruyne': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Kevin_De_Bruyne_2021.jpg/120px-Kevin_De_Bruyne_2021.jpg',
+  'Memphis Depay': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Memphis_Depay_2022.jpg/120px-Memphis_Depay_2022.jpg',
+  'Cody Gakpo': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Cody_Gakpo_2023.jpg/120px-Cody_Gakpo_2023.jpg',
+};
+
+function playerPhoto(name){
+  return WIKI_PHOTOS[name] || null;
+}
+
+function customBarChart(containerId, items, getLabel, getValue, getImageUrl){
+  const container = document.getElementById(containerId);
+  if(!container) return;
+  const max = Math.max(...items.map(getValue), 1);
+  container.innerHTML = items.map(item => {
+    const label = getLabel(item);
+    const val = getValue(item);
+    const pct = Math.round((val / max) * 100);
+    const imgUrl = getImageUrl(item);
+    const imgHtml = imgUrl
+      ? `<div style="position:absolute;right:-20px;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;overflow:hidden;border:2px solid var(--white);box-shadow:0 1px 4px rgba(0,0,0,.2);background:var(--border);flex-shrink:0">
+           <img src="${imgUrl}" style="width:100%;height:100%;object-fit:cover;object-position:top" onerror="this.parentNode.style.background='#ddd';this.remove()">
+         </div>`
+      : '';
+    return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <div style="font-size:12px;color:#555550;width:130px;text-align:right;flex-shrink:0;font-family:'Barlow',sans-serif">${label}</div>
+      <div style="flex:1;height:36px;background:#F0EDE8;border-radius:6px;position:relative;padding-right:26px">
+        <div style="height:100%;width:${pct}%;background:#0033A0;border-radius:6px;display:flex;align-items:center;position:relative;min-width:${val>0?'36px':'0'}">
+          ${val>0?`<span style="font-size:12px;font-weight:600;color:#fff;padding-left:10px;font-family:'Barlow Condensed',sans-serif">${val}</span>`:''}
+          ${imgHtml}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 function renderCharts(){
   Object.values(charts).forEach(c=>c.destroy());charts={};
   if(!allEntries.length){document.getElementById('charts-wrap').innerHTML='<div class="empty-state"><div class="big">📊</div><p style="margin-top:12px">Nog geen voorspellingen.</p></div>';return;}
   const wrap=document.getElementById('charts-wrap');
   wrap.innerHTML=`
-    <div class="chart-card"><div class="chart-title">Wie wint het WK?</div><div class="chart-wrap"><canvas id="c-winner"></canvas></div></div>
+    <div class="chart-card"><div class="chart-title">Wie wint het WK?</div><div id="c-winner-custom" style="padding-right:8px"></div></div>
     <div class="chart-card"><div class="chart-title">Hoe ver komt Nederland?</div><div class="chart-wrap" style="height:220px"><canvas id="c-nl"></canvas></div></div>
     <div class="chart-card"><div class="chart-title">Hoe ver komt België?</div><div class="chart-wrap" style="height:220px"><canvas id="c-be"></canvas></div></div>
-    <div class="chart-card"><div class="chart-title">Topscorer voorspellingen</div><div class="chart-wrap"><canvas id="c-scorer"></canvas></div></div>
+    <div class="chart-card"><div class="chart-title">Topscorer voorspellingen</div><div id="c-scorer-custom" style="padding-right:8px"></div></div>
     <div class="chart-card"><div class="chart-title">Stand (punten)</div><div class="chart-wrap" style="height:220px"><canvas id="c-stand"></canvas></div></div>`;
-  const COLS=['#0033A0','#E8192C','#F5C800','#00843D','#C6007E','#0066CC','#FF6600','#663399'];
-  function pieChart(id,data){const freq={};data.filter(Boolean).forEach(v=>{freq[v]=(freq[v]||0)+1;});const sorted=Object.entries(freq).sort((a,b)=>b[1]-a[1]);charts[id]=new Chart(document.getElementById(id),{type:'doughnut',data:{labels:sorted.map(e=>e[0]),datasets:[{data:sorted.map(e=>e[1]),backgroundColor:COLS.slice(0,sorted.length),borderWidth:0,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#555550',font:{family:'Barlow',size:12},padding:14,boxWidth:14}}},cutout:'58%'}});}
+
   function barChart(id,labels,data,horizontal){charts[id]=new Chart(document.getElementById(id),{type:'bar',data:{labels,datasets:[{data,backgroundColor:'#0033A0',borderRadius:5,borderSkipped:false,hoverBackgroundColor:'#E8192C'}]},options:{indexAxis:horizontal?'y':'x',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#999892',font:{family:'Barlow',size:12}},grid:{color:'#E2DDD6'}},y:{ticks:{color:'#999892',font:{family:'Barlow',size:12},precision:0},grid:{color:'#E2DDD6'}}}}});}
-  pieChart('c-winner',allEntries.map(e=>e.winnaar));
+
+  // Winnaar — custom bars met vlagcirkel
+  const winFreq={};
+  allEntries.forEach(e=>{if(e.winnaar)winFreq[e.winnaar]=(winFreq[e.winnaar]||0)+1;});
+  const winItems=Object.entries(winFreq).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([n,c])=>({name:n,count:c}));
+  customBarChart('c-winner-custom', winItems,
+    item=>item.name,
+    item=>item.count,
+    item=>{const ct=ALL_COUNTRIES.find(x=>x.n===item.name);return ct?flagUrl(ct.c):null;}
+  );
+
+  // NL/BE ronde
   const rounds=['Groepsfase uit','1/16 finale','1/8 finale','Kwartfinale','Halve finale','Derde plaats','Finale (verlies)','🏆 Wereldkampioen'];
   function roundBar(field,id){const freq={};allEntries.forEach(e=>{if(e[field])freq[e[field]]=(freq[e[field]]||0)+1;});const lbls=rounds.filter(r=>freq[r]);barChart(id,lbls,lbls.map(l=>freq[l]||0),false);}
   roundBar('hoe_ver_nl','c-nl');roundBar('hoe_ver_be','c-be');
-  // Fuzzy groepering topscorers
+
+  // Topscorer — custom bars met spelersfotos
   const sfGroups=[];
   allEntries.forEach(e=>{
     if(!e.topscorer)return;
@@ -712,7 +771,13 @@ function renderCharts(){
     else sfGroups.push({canonical:ts,count:1});
   });
   const top=sfGroups.sort((a,b)=>b.count-a.count).slice(0,8);
-  barChart('c-scorer',top.map(e=>e.canonical),top.map(e=>e.count),true);
+  customBarChart('c-scorer-custom', top,
+    item=>item.canonical,
+    item=>item.count,
+    item=>playerPhoto(item.canonical)
+  );
+
+  // Stand
   const scored=allEntries.map(e=>({naam:e.naam,pts:(calcEntryPoints(e,realScores)||{pts:0}).pts})).sort((a,b)=>b.pts-a.pts);
   barChart('c-stand',scored.map(e=>e.naam),scored.map(e=>e.pts),true);
 }
