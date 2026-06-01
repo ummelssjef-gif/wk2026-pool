@@ -484,7 +484,7 @@ function calcEntryPoints(entry, rs){
   if(rs.finalist&&entry.finalist){if(entry.finalist===rs.finalist){pts+=8;details.bonus.push({label:'Verliezend finalist',pts:8,ok:true});}else details.bonus.push({label:'Verliezend finalist',pts:0,ok:false});}
   if(rs.nlver&&entry.hoe_ver_nl){if(entry.hoe_ver_nl===rs.nlver){pts+=5;details.bonus.push({label:'Hoe ver NL',pts:5,ok:true});}else details.bonus.push({label:'Hoe ver NL',pts:0,ok:false});}
   if(rs.bever&&entry.hoe_ver_be){if(entry.hoe_ver_be===rs.bever){pts+=5;details.bonus.push({label:'Hoe ver BE',pts:5,ok:true});}else details.bonus.push({label:'Hoe ver BE',pts:0,ok:false});}
-  if(rs.topscorer&&entry.topscorer){if(entry.topscorer.toLowerCase()===rs.topscorer.toLowerCase()){pts+=8;details.bonus.push({label:'Topscorer',pts:8,ok:true});}else details.bonus.push({label:'Topscorer',pts:0,ok:false});}
+  if(rs.topscorer&&entry.topscorer){if(fuzzyMatch(entry.topscorer,rs.topscorer)){pts+=8;details.bonus.push({label:'Topscorer',pts:8,ok:true});}else details.bonus.push({label:'Topscorer',pts:0,ok:false});}
   return{pts,details};
 }
 
@@ -538,8 +538,36 @@ async function loadEntries(target){
   if(target==='rapport')renderCharts();
 }
 
+// ── FUZZY NAME MATCH ──
+function normalizeName(s){
+  if(!s)return'';
+  return s.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z0-9]/g,' ')
+    .replace(/\s+/g,' ').trim();
+}
+function fuzzyMatch(a,b){
+  if(!a||!b)return false;
+  const na=normalizeName(a),nb=normalizeName(b);
+  if(na===nb)return true;
+  const wa=na.split(' '),wb=nb.split(' ');
+  const shorter=wa.length<=wb.length?wa:wb;
+  const longer=wa.length<=wb.length?nb:na;
+  return shorter.filter(w=>w.length>2).length>0&&shorter.filter(w=>w.length>2).every(w=>longer.includes(w));
+}
+
 // ── OVERVIEW ──
-function topPick(arr){const f=arr.filter(Boolean);if(!f.length)return'–';const freq={};f.forEach(v=>{freq[v]=(freq[v]||0)+1;});return Object.entries(freq).sort((a,b)=>b[1]-a[1])[0][0];}
+function topPick(arr){
+  const f=arr.filter(Boolean);
+  if(!f.length)return'–';
+  const groups=[];
+  f.forEach(v=>{
+    const g=groups.find(g=>fuzzyMatch(g.canonical,v));
+    if(g){g.count++;if(v.length>g.canonical.length)g.canonical=v;}
+    else groups.push({canonical:v,count:1});
+  });
+  return groups.sort((a,b)=>b.count-a.count)[0].canonical;
+}
 
 function renderOverview(){
   document.getElementById('stat-count').textContent=allEntries.length;
@@ -624,9 +652,16 @@ function renderCharts(){
   const rounds=['Groepsfase uit','1/16 finale','1/8 finale','Kwartfinale','Halve finale','Derde plaats','Finale (verlies)','🏆 Wereldkampioen'];
   function roundBar(field,id){const freq={};allEntries.forEach(e=>{if(e[field])freq[e[field]]=(freq[e[field]]||0)+1;});const lbls=rounds.filter(r=>freq[r]);barChart(id,lbls,lbls.map(l=>freq[l]||0),false);}
   roundBar('hoe_ver_nl','c-nl');roundBar('hoe_ver_be','c-be');
-  const sf={};allEntries.forEach(e=>{if(e.topscorer)sf[e.topscorer]=(sf[e.topscorer]||0)+1;});
-  const top=Object.entries(sf).sort((a,b)=>b[1]-a[1]).slice(0,8);
-  barChart('c-scorer',top.map(e=>e[0]),top.map(e=>e[1]),true);
+  // Fuzzy groepering topscorers
+  const sfGroups=[];
+  allEntries.forEach(e=>{
+    if(!e.topscorer)return;
+    const g=sfGroups.find(g=>fuzzyMatch(g.canonical,e.topscorer));
+    if(g){g.count++;if(e.topscorer.length>g.canonical.length)g.canonical=e.topscorer;}
+    else sfGroups.push({canonical:e.topscorer,count:1});
+  });
+  const top=sfGroups.sort((a,b)=>b.count-a.count).slice(0,8);
+  barChart('c-scorer',top.map(e=>e.canonical),top.map(e=>e.count),true);
   const scored=allEntries.map(e=>({naam:e.naam,pts:(calcEntryPoints(e,realScores)||{pts:0}).pts})).sort((a,b)=>b.pts-a.pts);
   barChart('c-stand',scored.map(e=>e.naam),scored.map(e=>e.pts),true);
 }
