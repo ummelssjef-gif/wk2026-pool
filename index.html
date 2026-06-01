@@ -277,7 +277,8 @@ const ADMIN_PASS='Sjefisdebaas';
 const UNLOCK_DATE=new Date('2026-06-11T00:00:00');
 const DEADLINE=new Date('2026-06-11T00:00:00');
 
-let BIN_ID=localStorage.getItem('jsonbin_bin_id')||'';
+const FIXED_BIN_ID='6a1d229f21f9ee59d2a3b0c1';
+let BIN_ID=FIXED_BIN_ID;
 let allEntries=[];
 let realScores=null;
 let charts={};
@@ -369,13 +370,8 @@ function setStatus(msg,type){
 }
 
 async function initBin(){
-  if(BIN_ID)return;
-  try{
-    const r=await fetch('https://api.jsonbin.io/v3/b',{method:'POST',headers:{'Content-Type':'application/json','X-Master-Key':MASTER_KEY,'X-Bin-Name':'wk2026pool','X-Bin-Private':'false'},body:JSON.stringify({entries:[],realScores:null})});
-    const d=await r.json();
-    if(d.metadata?.id){BIN_ID=d.metadata.id;localStorage.setItem('jsonbin_bin_id',BIN_ID);}
-    else setStatus('Fout: '+JSON.stringify(d),'err');
-  }catch(e){setStatus('Netwerkfout: '+e.message,'err');}
+  // Bin ID is vast ingebakken, geen aanmaak nodig
+  return;
 }
 
 async function readBin(){
