@@ -682,9 +682,61 @@ function exportCSV(){
 function showStandenTab(tab){
   document.querySelectorAll('.s-tab').forEach(b=>b.classList.remove('active'));
   event.currentTarget.classList.add('active');
-  ['poules','wedstrijden','livescore'].forEach(t=>{
+  ['poules','wedstrijden','livescore','topscorers'].forEach(t=>{
     document.getElementById('standen-'+t).style.display = t===tab?'block':'none';
   });
+  if(tab==='topscorers') renderTopscorersWidgets();
+}
+
+function renderTopscorersWidgets(){
+  const wrap = document.getElementById('topscorer-widgets-wrap');
+  if(wrap.innerHTML.trim()) return; // al geladen
+
+  // Haal unieke topscorers op uit pool (fuzzy gegroepeerd)
+  const poolNames = allEntries.map(e=>e.topscorer).filter(Boolean);
+  const groups = [];
+  poolNames.forEach(v=>{
+    const g = groups.find(g=>fuzzyMatch(g.canonical, v));
+    if(g){if(v.length>g.canonical.length)g.canonical=v;}
+    else groups.push({canonical:v});
+  });
+
+  // Voeg daadwerkelijke topscorer toe als admin die heeft ingevuld
+  const realTs = realScores?.topscorer;
+  if(realTs && !groups.find(g=>fuzzyMatch(g.canonical, realTs))){
+    groups.unshift({canonical: realTs, isReal: true});
+  } else if(realTs){
+    const g = groups.find(g=>fuzzyMatch(g.canonical, realTs));
+    if(g) g.isReal = true;
+  }
+
+  if(!groups.length){
+    wrap.innerHTML='<div class="empty-state"><div class="big">⚽</div><p style="margin-top:12px">Nog geen topscorer voorspellingen ingevoerd.</p></div>';
+    return;
+  }
+
+  wrap.innerHTML = groups.map(g=>`
+    <div style="flex:1;min-width:280px;max-width:340px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:8px;display:flex;align-items:center;gap:6px">
+        ${g.isReal ? '<span style="background:var(--gold);color:var(--accent);padding:2px 7px;border-radius:10px;font-size:11px">DAADWERKELIJK</span>' : '<span style="background:var(--border);color:var(--text2);padding:2px 7px;border-radius:10px;font-size:11px">VOORSPELD</span>'}
+        ${g.canonical}
+      </div>
+      <div id="wg-api-football-player-${g.canonical.replace(/[^a-zA-Z0-9]/g,'_')}"
+        data-host="v3.football.api-sports.io"
+        data-key="7f2eaff8b2db96677ecfc94f83adc70e"
+        data-search="${g.canonical}"
+        data-league="1"
+        data-season="2026"
+        data-theme="white"
+        data-show-errors="false"
+        data-show-logos="true"
+        class="wg_loader">
+      </div>
+    </div>
+  `).join('');
+
+  // Herlaad widgets zodat de nieuw toegevoegde divs opgepikt worden
+  window.document.dispatchEvent(new Event("DOMContentLoaded", {bubbles:true, cancelable:true}));
 }
 
 // ── INIT ──
@@ -708,6 +760,7 @@ initBin();
     <button class="s-tab active" onclick="showStandenTab('poules')">Poulestand</button>
     <button class="s-tab" onclick="showStandenTab('wedstrijden')">Wedstrijden</button>
     <button class="s-tab" onclick="showStandenTab('livescore')">Live scores</button>
+    <button class="s-tab" onclick="showStandenTab('topscorers')">Topscorers</button>
   </div>
 
   <div id="standen-poules">
@@ -747,6 +800,12 @@ initBin();
       data-show-logos="true"
       class="wg_loader">
     </div>
+  </div>
+
+  <div id="standen-topscorers" style="display:none">
+    <div class="section-head" style="margin-top:0">⚽ Topscorer voorspellingen <div class="sh-line"></div></div>
+    <p style="font-size:13px;color:var(--text3);margin-bottom:16px">Spelersprofielen van de door de pool-deelnemers gekozen topscorers + de daadwerkelijke topscorer (ingevuld door admin).</p>
+    <div id="topscorer-widgets-wrap" style="display:flex;flex-wrap:wrap;gap:16px"></div>
   </div>
 </div>
 
