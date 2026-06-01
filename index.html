@@ -687,23 +687,26 @@ function renderOverview(){
 // ── CHARTS ──
 // ── WIKIPEDIA PHOTO LOOKUP ──
 const WIKI_PHOTOS = {
-  'Kylian Mbappé': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Kylian_Mbappe_2018.jpg/120px-Kylian_Mbappe_2018.jpg',
-  'Harry Kane': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Harry_Kane_2020.jpg/120px-Harry_Kane_2020.jpg',
-  'Cristiano Ronaldo': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Cristiano_Ronaldo_2018.jpg/120px-Cristiano_Ronaldo_2018.jpg',
-  'Erling Haaland': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Erling_Haaland_in_2022_%28cropped%29.jpg/120px-Erling_Haaland_in_2022_%28cropped%29.jpg',
-  'Lionel Messi': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Lionel-Messi-Argentina-2022-FIFA-World-Cup_%28cropped%29.jpg/120px-Lionel-Messi-Argentina-2022-FIFA-World-Cup_%28cropped%29.jpg',
-  'Neymar Jr.': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Neymar_-_2018_%28cropped%29.jpg/120px-Neymar_-_2018_%28cropped%29.jpg',
-  'Robert Lewandowski': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Robert_Lewandowski_%28cropped%2C_2%29.jpg/120px-Robert_Lewandowski_%28cropped%2C_2%29.jpg',
-  'Mohamed Salah': 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Mohamed_Salah_2022_%28cropped%29.jpg/120px-Mohamed_Salah_2022_%28cropped%29.jpg',
-  'Vinícius Júnior': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Vinicius_Jr_%28cropped%29.jpg/120px-Vinicius_Jr_%28cropped%29.jpg',
-  'Jude Bellingham': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Jude_Bellingham_2022_%28cropped%29.jpg/120px-Jude_Bellingham_2022_%28cropped%29.jpg',
-  'Lamine Yamal': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Lamine_Yamal_2024_%28cropped%29.jpg/120px-Lamine_Yamal_2024_%28cropped%29.jpg',
-  'Kevin De Bruyne': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Kevin_De_Bruyne_2022_%28cropped%29.jpg/120px-Kevin_De_Bruyne_2022_%28cropped%29.jpg',
-  'Memphis Depay': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Memphis_Depay_2021_%28cropped%29.jpg/120px-Memphis_Depay_2021_%28cropped%29.jpg',
-  'Cody Gakpo': 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Cody_Gakpo_2022_%28cropped%29.jpg/120px-Cody_Gakpo_2022_%28cropped%29.jpg',
-  'Virgil van Dijk': 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Virgil_van_Dijk_2022_%28cropped%29.jpg/120px-Virgil_van_Dijk_2022_%28cropped%29.jpg',
-  'Romelu Lukaku': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Romelu_Lukaku_2022_%28cropped%29.jpg/120px-Romelu_Lukaku_2022_%28cropped%29.jpg',
-  'Karim Benzema': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Karim_Benzema_2022_%28cropped%29.jpg/120px-Karim_Benzema_2022_%28cropped%29.jpg',
+  'Kylian Mbappé': 'https://sortitoutsi.b-cdn.net/uploads/face/face_85139014.png',
+  'Harry Kane': 'https://sortitoutsi.b-cdn.net/uploads/face/face_28049320.png',
+  'Cristiano Ronaldo': 'https://b.fssta.com/uploads/application/soccer/headshots/885.vresize.350.350.medium.1.png',
+  'Memphis Depay': 'https://sortitoutsi.b-cdn.net/uploads/face/face_37024470.png',
+  'Erling Haaland': 'https://sortitoutsi.b-cdn.net/uploads/face/face_209658424.png',
+  'Lionel Messi': 'https://sortitoutsi.b-cdn.net/uploads/face/face_158023.png',
+  'Neymar Jr.': 'https://sortitoutsi.b-cdn.net/uploads/face/face_190871.png',
+  'Robert Lewandowski': 'https://sortitoutsi.b-cdn.net/uploads/face/face_32004.png',
+  'Mohamed Salah': 'https://sortitoutsi.b-cdn.net/uploads/face/face_209331.png',
+  'Vinícius Júnior': 'https://sortitoutsi.b-cdn.net/uploads/face/face_238794.png',
+  'Jude Bellingham': 'https://sortitoutsi.b-cdn.net/uploads/face/face_237099.png',
+  'Lamine Yamal': 'https://sortitoutsi.b-cdn.net/uploads/face/face_985768.png',
+  'Kevin De Bruyne': 'https://sortitoutsi.b-cdn.net/uploads/face/face_192985.png',
+  'Cody Gakpo': 'https://sortitoutsi.b-cdn.net/uploads/face/face_246669.png',
+  'Virgil van Dijk': 'https://sortitoutsi.b-cdn.net/uploads/face/face_97.png',
+  'Romelu Lukaku': 'https://sortitoutsi.b-cdn.net/uploads/face/face_192505.png',
+  'Karim Benzema': 'https://sortitoutsi.b-cdn.net/uploads/face/face_182521.png',
+  'Denzel Dumfries': 'https://sortitoutsi.b-cdn.net/uploads/face/face_241445.png',
+  'Pedri': 'https://sortitoutsi.b-cdn.net/uploads/face/face_844940.png',
+  'Luka Modrić': 'https://sortitoutsi.b-cdn.net/uploads/face/face_177003.png',
 };
 
 function playerPhoto(name){
@@ -720,9 +723,11 @@ function customBarChart(containerId, items, getLabel, getValue, getImageUrl){
     const pct = Math.round((val / max) * 100);
     const imgUrl = getImageUrl(item);
     const initials = label.split(' ').map(w=>w[0]).filter(Boolean).slice(0,2).join('').toUpperCase();
-    const imgHtml = `<div style="position:absolute;right:-20px;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;overflow:hidden;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.2);background:#CCC8BF;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#555;font-family:'Barlow',sans-serif" id="avatar-${label.replace(/[^a-zA-Z]/g,'_')}">
-      ${imgUrl ? `<img src="${imgUrl}" style="width:100%;height:100%;object-fit:cover;object-position:top;position:absolute;inset:0" onerror="this.remove()">` : ''}
-      <span style="position:relative;z-index:0">${initials}</span>
+    const avatarId = 'av_'+label.replace(/[^a-zA-Z0-9]/g,'_');
+    const imgHtml = `<div id="${avatarId}" style="position:absolute;right:-20px;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;overflow:hidden;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.2);background:#CCC8BF;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#555;font-family:'Barlow',sans-serif">
+      ${imgUrl
+        ? `<img src="${imgUrl}" style="width:100%;height:100%;object-fit:cover;object-position:top" onerror="this.remove();document.getElementById('${avatarId}').innerHTML='<span style=\'font-size:13px;font-weight:600;color:#555\'>${initials}</span>'">`
+        : `<span>${initials}</span>`}
     </div>`;
     return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
       <div style="font-size:12px;color:#555550;width:130px;text-align:right;flex-shrink:0;font-family:'Barlow',sans-serif">${label}</div>
