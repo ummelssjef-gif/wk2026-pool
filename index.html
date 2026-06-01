@@ -142,6 +142,7 @@ select.field-input option{background:var(--white)}
     <button class="nav-btn active" id="nav-invullen" onclick="goto('invullen')">Voorspelling</button>
     <button class="nav-btn locked" id="nav-overzicht" onclick="tryNav('overzicht')">Overzicht</button>
     <button class="nav-btn locked" id="nav-rapport" onclick="tryNav('rapport')">Rapport</button>
+    <button class="nav-btn" id="nav-standen" onclick="goto('standen')">WK Standen</button>
     <div class="admin-dot" title="Beheerder" onclick="promptAdmin()"></div>
   </nav>
 </header>
@@ -333,6 +334,7 @@ function goto(page){
   document.getElementById('page-'+page).classList.add('active');
   document.getElementById('nav-'+page).classList.add('active');
   if(page==='overzicht'||page==='rapport') loadEntries(page);
+  if(page==='standen') loadStanden();
 }
 
 function tryNav(page){
@@ -675,6 +677,139 @@ function exportCSV(){
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'}));a.download='wk2026_pool.csv';a.click();
 }
 
+
+// ── STANDEN ──
+const FD_API = 'https://api.football-data.org/v4/competitions/WC';
+const FD_HEADERS = {'X-Auth-Token': 'e0851cbf247a42899a1fe6854a84390b'};
+
+let standenCache = null;
+let matchesCache = null;
+
+function showStandenTab(tab){
+  document.querySelectorAll('.s-tab').forEach(b=>b.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  document.getElementById('standen-poules').style.display = tab==='poules'?'block':'none';
+  document.getElementById('standen-bracket').style.display = tab==='bracket'?'block':'none';
+  if(tab==='bracket' && matchesCache) renderBracket(matchesCache);
+}
+
+async function loadStanden(){
+  document.getElementById('standen-poules').innerHTML='<div class="loading">Poulestand ophalen...</div>';
+  document.getElementById('standen-bracket').innerHTML='<div class="loading">Bracket ophalen...</div>';
+  try {
+    const [standRes, matchRes] = await Promise.all([
+      fetch(FD_API+'/standings', {headers: FD_HEADERS}),
+      fetch(FD_API+'/matches', {headers: FD_HEADERS})
+    ]);
+    const standData = await standRes.json();
+    const matchData = await matchRes.json();
+    standenCache = standData;
+    matchesCache = matchData;
+    renderPoules(standData);
+    renderBracket(matchData);
+    document.getElementById('standen-lastupdate').textContent = 'Bijgewerkt: ' + new Date().toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'});
+  } catch(e) {
+    document.getElementById('standen-poules').innerHTML = '<div class="empty-state"><div class="big">⚠</div><p style="margin-top:12px">Kon data niet ophalen: '+e.message+'</p></div>';
+  }
+}
+
+function teamFlag(team){
+  const cca = team.shortName || team.name || '';
+  const map = {
+    'Netherlands':'nl','Belgium':'be','Japan':'jp','Sweden':'se','Tunisia':'tn',
+    'Egypt':'eg','Iran':'ir','New Zealand':'nz','Brazil':'br','Argentina':'ar',
+    'France':'fr','England':'gb-eng','Spain':'es','Germany':'de','Portugal':'pt',
+    'Morocco':'ma','USA':'us','Mexico':'mx','Canada':'ca','Uruguay':'uy',
+    'Colombia':'co','Ecuador':'ec','Chile':'cl','Paraguay':'py','Peru':'pe',
+    'Australia':'au','South Korea':'kr','Japan':'jp','Saudi Arabia':'sa',
+    'Qatar':'qa','Iraq':'iq','Jordan':'jo','Uzbekistan':'uz','Ghana':'gh',
+    'Senegal':'sn','Ivory Coast':'ci','Morocco':'ma','Algeria':'dz',
+    'South Africa':'za','Cameroon':'cm','Nigeria':'ng','Congo DR':'cd',
+    'Cape Verde':'cv','Croatia':'hr','Austria':'at','Czech Republic':'cz',
+    'Switzerland':'ch','Scotland':'gb-sct','Norway':'no','Turkey':'tr',
+    'Slovakia':'sk','Haiti':'ht','Panama':'pa','Suriname':'sr','Curaçao':'cw',
+    'Costa Rica':'cr','Honduras':'hn','Jamaica':'jm','Venezuela':'ve',
+    'Bolivia':'bo','New Zealand':'nz','Fiji':'fj','Indonesia':'id',
+  };
+  const key = Object.keys(map).find(k => (team.name||'').includes(k) || (team.shortName||'').includes(k));
+  return key ? `https://flagcdn.com/w40/${map[key]}.png` : `https://flagcdn.com/w40/un.png`;
+}
+
+function renderPoules(data){
+  const standings = data.standings || [];
+  if(!standings.length){
+    document.getElementById('standen-poules').innerHTML='<div class="empty-state"><div class="big">⏳</div><p style="margin-top:12px">Poulestand nog niet beschikbaar — het WK begint op 11 juni 2026.</p></div>';
+    return;
+  }
+  // Group by group (filter GROUP type)
+  const groups = standings.filter(s=>s.type==='TOTAL'||s.stage==='GROUP_STAGE');
+  const html = '<div class="poule-grid">' + groups.map(group => {
+    const name = group.group || group.stage || 'Groep';
+    const letter = name.replace('GROUP_','').replace('GROUP ','');
+    const rows = (group.table||[]).map((t,i) => {
+      const qualified = i < 2;
+      const flag = teamFlag(t.team);
+      return `<tr class="${qualified?'qualified':''}">
+        <td><div class="pt-team"><img class="pt-flag" src="${flag}" onerror="this.style.display='none'">${t.team.shortName||t.team.name}</div></td>
+        <td style="text-align:center">${t.playedGames}</td>
+        <td style="text-align:center">${t.won}</td>
+        <td style="text-align:center">${t.draw}</td>
+        <td style="text-align:center">${t.lost}</td>
+        <td style="text-align:center">${t.goalsFor}:${t.goalsAgainst}</td>
+        <td style="text-align:center"><span class="pt-pts">${t.points}</span></td>
+      </tr>`;
+    }).join('');
+    return `<div class="poule-card">
+      <div class="poule-header"><span class="ph-gold">Groep ${letter}</span></div>
+      <table class="poule-table">
+        <thead><tr><th>Team</th><th>G</th><th>W</th><th>G</th><th>V</th><th>Doel</th><th>Pt</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+  }).join('') + '</div>';
+  document.getElementById('standen-poules').innerHTML = html || '<div class="empty-state"><div class="big">⏳</div><p style="margin-top:12px">Poulestand nog niet beschikbaar — het WK begint op 11 juni 2026.</p></div>';
+}
+
+function renderBracket(data){
+  const matches = (data.matches||[]).filter(m=>m.stage&&m.stage!=='GROUP_STAGE');
+  const roundOrder = ['ROUND_OF_16','QUARTER_FINALS','SEMI_FINALS','THIRD_PLACE','FINAL'];
+  const roundNames = {'ROUND_OF_16':'1/8 Finale','QUARTER_FINALS':'Kwartfinale','SEMI_FINALS':'Halve Finale','THIRD_PLACE':'3e Plaats','FINAL':'Finale'};
+
+  if(!matches.length){
+    document.getElementById('standen-bracket').innerHTML='<div class="empty-state"><div class="big">🏆</div><p style="margin-top:12px">Knock-out fase begint na de groepsfase (vanaf ~2 juli 2026).</p></div>';
+    return;
+  }
+
+  const html = '<div class="bracket-wrap"><div class="bracket">' +
+    roundOrder.filter(r=>matches.some(m=>m.stage===r)).map(round => {
+      const rMatches = matches.filter(m=>m.stage===round);
+      const matchHtml = rMatches.map(m => {
+        const h = m.homeTeam, a = m.awayTeam;
+        const sh = m.score?.fullTime?.home, sa = m.score?.fullTime?.away;
+        const winner = sh!=null&&sa!=null ? (sh>sa?'home':sh<sa?'away':'') : '';
+        const tbd = '<span class="bm-tbd">TBD</span>';
+        return `<div class="bracket-match">
+          <div class="bm-team ${winner==='home'?'winner':''}">
+            ${h?.name?`<img src="${teamFlag(h)}" onerror="this.style.display='none'">`:''}
+            ${h?.shortName||h?.name||tbd}
+            ${sh!=null?`<span class="bm-score">${sh}</span>`:''}
+          </div>
+          <div class="bm-team ${winner==='away'?'winner':''}">
+            ${a?.name?`<img src="${teamFlag(a)}" onerror="this.style.display='none'">`:''}
+            ${a?.shortName||a?.name||tbd}
+            ${sa!=null?`<span class="bm-score">${sa}</span>`:''}
+          </div>
+        </div>`;
+      }).join('');
+      return `<div class="bracket-round">
+        <div class="bracket-round-title">${roundNames[round]||round}</div>
+        <div class="bracket-matches">${matchHtml}</div>
+      </div>`;
+    }).join('<div class="bracket-connector">›</div>') +
+  '</div></div>';
+  document.getElementById('standen-bracket').innerHTML = html;
+}
+
 // ── INIT ──
 if(isAdmin){
   document.getElementById('admin-badge').style.display='inline';
@@ -683,5 +818,56 @@ if(isAdmin){
 checkDeadline();
 initBin();
 </script>
+
+<!-- STANDEN -->
+<div id="page-standen" class="page">
+  <div class="hero" style="margin-bottom:20px">
+    <div class="hero-label">Live via football-data.org</div>
+    <div class="hero-title">WK 2026 Standen</div>
+    <div class="hero-sub">Alle 12 poules · Knock-out bracket</div>
+  </div>
+  <div class="btn-row">
+    <button class="action-btn" onclick="loadStanden()">↻ Vernieuwen</button>
+    <div id="standen-lastupdate" style="font-size:12px;color:var(--text3);align-self:center"></div>
+  </div>
+  <div id="standen-tabs" style="display:flex;gap:4px;margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:0">
+    <button class="s-tab active" onclick="showStandenTab('poules')">Poules</button>
+    <button class="s-tab" onclick="showStandenTab('bracket')">Knock-out bracket</button>
+  </div>
+  <div id="standen-poules"><div class="loading">Laden...</div></div>
+  <div id="standen-bracket" style="display:none"><div class="loading">Laden...</div></div>
+</div>
+
+<style>
+.s-tab{background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-1px;padding:8px 18px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);cursor:pointer;transition:all .18s}
+.s-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.poule-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-bottom:24px}
+.poule-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.poule-header{background:var(--accent);padding:8px 14px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--white);display:flex;align-items:center;gap:8px}
+.poule-header .ph-gold{color:var(--gold)}
+.poule-table{width:100%;border-collapse:collapse;font-size:12px}
+.poule-table th{padding:5px 8px;text-align:left;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;font-size:10px;border-bottom:1px solid var(--border)}
+.poule-table td{padding:6px 8px;border-bottom:1px solid var(--border);color:var(--text)}
+.poule-table tr:last-child td{border-bottom:none}
+.poule-table tr.qualified td{background:rgba(0,51,160,.04)}
+.poule-table tr.qualified td:first-child{border-left:3px solid var(--accent)}
+.pt-team{display:flex;align-items:center;gap:6px;font-weight:600}
+.pt-flag{width:20px;height:13px;border-radius:2px;object-fit:cover}
+.pt-pts{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;color:var(--accent)}
+.bracket-wrap{overflow-x:auto;padding-bottom:16px}
+.bracket{display:flex;gap:0;min-width:900px}
+.bracket-round{display:flex;flex-direction:column;flex:1;min-width:140px}
+.bracket-round-title{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);text-align:center;padding:8px 0 12px;border-bottom:1px solid var(--border);margin-bottom:12px}
+.bracket-matches{display:flex;flex-direction:column;justify-content:space-around;flex:1;gap:8px;padding:0 6px}
+.bracket-match{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.bm-team{display:flex;align-items:center;gap:6px;padding:6px 10px;font-size:12px;font-weight:600;border-bottom:1px solid var(--border)}
+.bm-team:last-child{border-bottom:none}
+.bm-team.winner{background:rgba(0,51,160,.06);color:var(--accent)}
+.bm-team img{width:18px;height:12px;border-radius:2px;object-fit:cover}
+.bm-score{margin-left:auto;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800}
+.bm-tbd{color:var(--text3);font-style:italic;font-weight:400}
+.bracket-connector{display:flex;align-items:center;justify-content:center;color:var(--border2);font-size:18px;padding:0 2px}
+</style>
+
 </body>
 </html>
