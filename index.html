@@ -469,30 +469,20 @@ select.field-input option{background:var(--white)}
 <!-- STANDEN -->
 <div id="page-standen" class="page">
   <div class="hero" style="margin-bottom:20px">
-    <div class="hero-label">Live via api-football</div>
+    <div class="hero-label">Live data</div>
     <div class="hero-title">WK 2026 Standen</div>
-    <div class="hero-sub">Alle 12 poules · Wedstrijden · Live scores</div>
+    <div class="hero-sub">Alle 12 poules · Wedstrijdschema · Uitslagen</div>
   </div>
-  <div id="standen-tabs" style="display:flex;gap:4px;margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:0">
+  <div id="standen-tabs" style="display:flex;gap:4px;margin-bottom:16px;border-bottom:1px solid var(--border);padding-bottom:0">
     <button class="s-tab active" onclick="showStandenTab('poules')">Poulestand</button>
     <button class="s-tab" onclick="showStandenTab('wedstrijden')">Wedstrijden</button>
-    <button class="s-tab" onclick="showStandenTab('livescore')">Live scores</button>
-    <button class="s-tab" onclick="showStandenTab('topscorers')">Topscorers</button>
   </div>
-  <div id="standen-poules">
-    <div id="wg-api-football-standings" data-host="v3.football.api-sports.io" data-key="7f2eaff8b2db96677ecfc94f83adc70e" data-league="1" data-season="2026" data-theme="white" data-show-errors="false" data-show-logos="true" class="wg_loader"></div>
+  <div class="btn-row" style="margin-bottom:16px">
+    <button class="action-btn" onclick="loadStanden(true)">↻ Vernieuwen</button>
+    <div id="standen-lastupdate" style="font-size:12px;color:var(--text3);align-self:center"></div>
   </div>
-  <div id="standen-wedstrijden" style="display:none">
-    <div id="wg-api-football-fixtures" data-host="v3.football.api-sports.io" data-key="7f2eaff8b2db96677ecfc94f83adc70e" data-league="1" data-season="2026" data-theme="white" data-show-errors="false" data-show-logos="true" class="wg_loader"></div>
-  </div>
-  <div id="standen-livescore" style="display:none">
-    <div id="wg-api-football-livescore" data-host="v3.football.api-sports.io" data-key="7f2eaff8b2db96677ecfc94f83adc70e" data-league="1" data-season="2026" data-theme="white" data-show-errors="false" data-show-logos="true" class="wg_loader"></div>
-  </div>
-  <div id="standen-topscorers" style="display:none">
-    <div class="section-head" style="margin-top:0">⚽ Topscorer voorspellingen <div class="sh-line"></div></div>
-    <p style="font-size:13px;color:var(--text3);margin-bottom:16px">Spelersprofielen van de door de pool-deelnemers gekozen topscorers + de daadwerkelijke topscorer (ingevuld door admin).</p>
-    <div id="topscorer-widgets-wrap" style="display:flex;flex-wrap:wrap;gap:16px"></div>
-  </div>
+  <div id="standen-poules"><div class="loading">Laden...</div></div>
+  <div id="standen-wedstrijden" style="display:none"><div class="loading">Laden...</div></div>
 </div>
 
 <style>
@@ -650,7 +640,7 @@ function renderOverview(){
     return`<div class="entry-card"><div class="entry-card-header"><div class="entry-name">${e.naam}</div><div style="display:flex;align-items:center;gap:10px">${result?`<div class="entry-points">${result.pts} pt</div>`:''}<div class="entry-date">${new Date(e.tijdstip).toLocaleDateString('nl-NL',{day:'numeric',month:'short'})}</div></div></div><div class="entry-body"><div class="entry-section-lbl"><img src="${flagUrl('nl')}" class="mini-flag"> Nederland</div>${e.nl.map((m,i)=>{const real=realScores&&realScores['nl'+(i+1)+'-played']==='1'?`${realScores['nl'+(i+1)+'h']}–${realScores['nl'+(i+1)+'a']}`:'';const p=real?calcMatchPoints(m.thuis,m.uit,realScores['nl'+(i+1)+'h'],realScores['nl'+(i+1)+'a']):null;const ptsBadge=p===null?'':`<span class="pts ${p===5?'pts-exact':p===2?'pts-winner':'pts-none'}">${p===5?'+5 exact':p===2?'+2 winnaar':'0'}</span>`;return`<div class="match-mini"><img src="${flagUrl('nl')}" class="mini-flag"><span class="score">${m.thuis||'?'}–${m.uit||'?'}</span><img src="${flagUrl(NL_OPPS[i].c)}" class="mini-flag">${real?`<span style="color:var(--text3);font-size:11px">(echt: ${real})</span>`:''}${ptsBadge}</div>`;}).join('')}<div class="entry-section-lbl" style="margin-top:10px"><img src="${flagUrl('be')}" class="mini-flag"> België</div>${e.be.map((m,i)=>{const real=realScores&&realScores['be'+(i+1)+'-played']==='1'?`${realScores['be'+(i+1)+'h']}–${realScores['be'+(i+1)+'a']}`:'';const p=real?calcMatchPoints(m.thuis,m.uit,realScores['be'+(i+1)+'h'],realScores['be'+(i+1)+'a']):null;const ptsBadge=p===null?'':`<span class="pts ${p===5?'pts-exact':p===2?'pts-winner':'pts-none'}">${p===5?'+5 exact':p===2?'+2 winnaar':'0'}</span>`;const homeFlag=i===2?NZ:{c:'be'};const awayFlag=i===2?{c:'be'}:BE_OPPS[i];return`<div class="match-mini"><img src="${flagUrl(homeFlag.c)}" class="mini-flag"><span class="score">${m.thuis||'?'}–${m.uit||'?'}</span><img src="${flagUrl(awayFlag.c)}" class="mini-flag">${real?`<span style="color:var(--text3);font-size:11px">(echt: ${real})</span>`:''}${ptsBadge}</div>`;}).join('')}<div class="entry-grid"><div class="entry-item">Winnaar<strong>${wFlag?`<img src="${wFlag}" style="width:18px;height:12px;border-radius:2px;object-fit:cover">`:''} ${e.winnaar||'–'}</strong></div><div class="entry-item">Finalist<strong>${fFlag?`<img src="${fFlag}" style="width:18px;height:12px;border-radius:2px;object-fit:cover">`:''} ${e.finalist||'–'}</strong></div><div class="entry-item">Hoe ver NL<strong><img src="${flagUrl('nl')}" style="width:18px;height:12px;border-radius:2px;object-fit:cover"> ${e.hoe_ver_nl||'–'}</strong></div><div class="entry-item">Hoe ver BE<strong><img src="${flagUrl('be')}" style="width:18px;height:12px;border-radius:2px;object-fit:cover"> ${e.hoe_ver_be||'–'}</strong></div><div class="entry-item" style="grid-column:span 2">Topscorer<strong>⚽ ${e.topscorer||'–'}</strong></div></div></div></div>`;
   }).join('');
 }
-const WIKI_PHOTOS={'Kylian Mbappé':'https://sortitoutsi.b-cdn.net/uploads/face/face_85139014.png','Harry Kane':'https://sortitoutsi.b-cdn.net/uploads/face/face_28049320.png','Cristiano Ronaldo':'https://b.fssta.com/uploads/application/soccer/headshots/885.vresize.350.350.medium.1.png','Memphis Depay':'https://sortitoutsi.b-cdn.net/uploads/face/face_37024470.png','Erling Haaland':'https://sortitoutsi.b-cdn.net/uploads/face/face_209658424.png','Lionel Messi':'https://sortitoutsi.b-cdn.net/uploads/face/face_158023.png','Neymar Jr.':'https://sortitoutsi.b-cdn.net/uploads/face/face_190871.png','Robert Lewandowski':'https://sortitoutsi.b-cdn.net/uploads/face/face_32004.png','Mohamed Salah':'https://sortitoutsi.b-cdn.net/uploads/face/face_209331.png','Vinícius Júnior':'https://sortitoutsi.b-cdn.net/uploads/face/face_238794.png','Jude Bellingham':'https://sortitoutsi.b-cdn.net/uploads/face/face_237099.png','Lamine Yamal':'https://sortitoutsi.b-cdn.net/uploads/face/face_985768.png','Kevin De Bruyne':'https://sortitoutsi.b-cdn.net/uploads/face/face_192985.png','Cody Gakpo':'https://sortitoutsi.b-cdn.net/uploads/face/face_246669.png','Virgil van Dijk':'https://sortitoutsi.b-cdn.net/uploads/face/face_97.png','Romelu Lukaku':'https://sortitoutsi.b-cdn.net/uploads/face/face_192505.png','Karim Benzema':'https://sortitoutsi.b-cdn.net/uploads/face/face_182521.png','Denzel Dumfries':'https://sortitoutsi.b-cdn.net/uploads/face/face_241445.png','Pedri':'https://sortitoutsi.b-cdn.net/uploads/face/face_844940.png','Luka Modrić':'https://sortitoutsi.b-cdn.net/uploads/face/face_177003.png'};
+const WIKI_PHOTOS={'Kylian Mbappé':'https://sortitoutsi.b-cdn.net/uploads/face/face_85139014.png','Harry Kane':'https://sortitoutsi.b-cdn.net/uploads/face/face_28049320.png','Cristiano Ronaldo':'https://b.fssta.com/uploads/application/soccer/headshots/885.vresize.350.350.medium.1.png','Memphis Depay':'https://sortitoutsi.b-cdn.net/uploads/face/face_37024470.png','Erling Haaland':'https://sortitoutsi.b-cdn.net/uploads/face/face_209658424.png','Lionel Messi':'https://sortitoutsi.b-cdn.net/uploads/face/face_158023.png','Neymar Jr.':'https://sortitoutsi.b-cdn.net/uploads/face/face_190871.png','Robert Lewandowski':'https://sortitoutsi.b-cdn.net/uploads/face/face_32004.png','Mohamed Salah':'https://sortitoutsi.b-cdn.net/uploads/face/face_209331.png','Vinícius Júnior':'https://sortitoutsi.b-cdn.net/uploads/face/face_238794.png','Jude Bellingham':'https://sortitoutsi.b-cdn.net/uploads/face/face_237099.png','Lamine Yamal':'https://sortitoutsi.b-cdn.net/uploads/face/face_2000256231.png','Kevin De Bruyne':'https://sortitoutsi.b-cdn.net/uploads/face/face_192985.png','Cody Gakpo':'https://sortitoutsi.b-cdn.net/uploads/face/face_246669.png','Virgil van Dijk':'https://sortitoutsi.b-cdn.net/uploads/face/face_97.png','Romelu Lukaku':'https://sortitoutsi.b-cdn.net/uploads/face/face_192505.png','Karim Benzema':'https://sortitoutsi.b-cdn.net/uploads/face/face_182521.png','Denzel Dumfries':'https://sortitoutsi.b-cdn.net/uploads/face/face_241445.png','Pedri':'https://sortitoutsi.b-cdn.net/uploads/face/face_844940.png','Luka Modrić':'https://sortitoutsi.b-cdn.net/uploads/face/face_177003.png'};
 function playerPhoto(name){return WIKI_PHOTOS[name]||null;}
 function customBarChart(containerId,items,getLabel,getValue,getImageUrl){
   const container=document.getElementById(containerId);if(!container)return;
@@ -691,25 +681,97 @@ function exportCSV(){
 function showStandenTab(tab){
   document.querySelectorAll('.s-tab').forEach(b=>b.classList.remove('active'));
   event.currentTarget.classList.add('active');
-  ['poules','wedstrijden','livescore','topscorers'].forEach(t=>{document.getElementById('standen-'+t).style.display=t===tab?'block':'none';});
-  if(tab==='topscorers')renderTopscorersWidgets();
+  ['poules','wedstrijden'].forEach(t=>{
+    const el=document.getElementById('standen-'+t);
+    if(el) el.style.display=t===tab?'block':'none';
+  });
 }
-function loadStanden(){}
-function renderTopscorersWidgets(){
-  const wrap=document.getElementById('topscorer-widgets-wrap');if(wrap.innerHTML.trim())return;
-  const poolNames=allEntries.map(e=>canonicalPlayer(e.topscorer)).filter(Boolean);
-  const groups=[];poolNames.forEach(v=>{const g=groups.find(g=>fuzzyMatch(g.canonical,v));if(g){if(v.length>g.canonical.length)g.canonical=v;}else groups.push({canonical:v});});
-  const realTs=realScores?.topscorer;
-  if(realTs&&!groups.find(g=>fuzzyMatch(g.canonical,realTs)))groups.unshift({canonical:realTs,isReal:true});
-  else if(realTs){const g=groups.find(g=>fuzzyMatch(g.canonical,realTs));if(g)g.isReal=true;}
-  if(!groups.length){wrap.innerHTML='<div class="empty-state"><div class="big">⚽</div><p style="margin-top:12px">Nog geen topscorer voorspellingen ingevoerd.</p></div>';return;}
-  wrap.innerHTML=groups.map(g=>`<div style="flex:1;min-width:280px;max-width:340px"><div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:8px;display:flex;align-items:center;gap:6px">${g.isReal?'<span style="background:var(--gold);color:var(--accent);padding:2px 7px;border-radius:10px;font-size:11px">DAADWERKELIJK</span>':'<span style="background:var(--border);color:var(--text2);padding:2px 7px;border-radius:10px;font-size:11px">VOORSPELD</span>'} ${g.canonical}</div><div id="wg-api-football-player-${g.canonical.replace(/[^a-zA-Z0-9]/g,'_')}" data-host="v3.football.api-sports.io" data-key="7f2eaff8b2db96677ecfc94f83adc70e" data-search="${g.canonical}" data-league="1" data-season="2026" data-theme="white" data-show-errors="false" data-show-logos="true" class="wg_loader"></div></div>`).join('');
-  window.document.dispatchEvent(new Event("DOMContentLoaded",{bubbles:true,cancelable:true}));
+
+const WC_API='https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json';
+let wcData=null,wcCacheTime=null;
+const WC_CACHE_MS=60*60*1000;
+
+async function loadStanden(force){
+  const now=Date.now();
+  if(!force&&wcData&&wcCacheTime&&(now-wcCacheTime)<WC_CACHE_MS){
+    const mins=Math.round((WC_CACHE_MS-(now-wcCacheTime))/60000);
+    document.getElementById('standen-lastupdate').textContent='Uit cache · vernieuwd over ~'+mins+' min';
+    renderPoules(wcData);renderWedstrijden(wcData);return;
+  }
+  document.getElementById('standen-poules').innerHTML='<div class="loading">Poulestand ophalen...</div>';
+  document.getElementById('standen-wedstrijden').innerHTML='<div class="loading">Wedstrijden ophalen...</div>';
+  try{
+    const r=await fetch(WC_API);
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    wcData=await r.json();wcCacheTime=Date.now();
+    renderPoules(wcData);renderWedstrijden(wcData);
+    document.getElementById('standen-lastupdate').textContent='Bijgewerkt: '+new Date().toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'});
+  }catch(e){
+    document.getElementById('standen-poules').innerHTML='<div class="empty-state"><div class="big">⚠</div><p style="margin-top:12px">Kon data niet ophalen: '+e.message+'</p></div>';
+    document.getElementById('standen-wedstrijden').innerHTML='';
+  }
 }
+
+function getFlagCode(name){
+  const map={'Netherlands':'nl','Belgium':'be','Japan':'jp','Sweden':'se','Tunisia':'tn','Egypt':'eg','Iran':'ir','New Zealand':'nz','Brazil':'br','Argentina':'ar','France':'fr','England':'gb-eng','Spain':'es','Germany':'de','Portugal':'pt','Morocco':'ma','United States':'us','USA':'us','Mexico':'mx','Canada':'ca','Uruguay':'uy','Colombia':'co','Ecuador':'ec','Australia':'au','South Korea':'kr','Saudi Arabia':'sa','Qatar':'qa','Iraq':'iq','Jordan':'jo','Uzbekistan':'uz','Ghana':'gh','Senegal':'sn',"Ivory Coast":'ci',"Côte d'Ivoire":'ci','Algeria':'dz','South Africa':'za','Cameroon':'cm','Nigeria':'ng','DR Congo':'cd','Cape Verde':'cv','Croatia':'hr','Austria':'at','Czech Republic':'cz','Switzerland':'ch','Scotland':'gb-sct','Norway':'no','Turkey':'tr','Slovakia':'sk','Haiti':'ht','Panama':'pa','Suriname':'sr','Curaçao':'cw','Venezuela':'ve','Paraguay':'py','Chile':'cl','Indonesia':'id','Bosnia-Herzegovina':'ba','Bosnia':'ba','Uzbekistan':'uz'};
+  return map[name]||'un';
+}
+
+function calcStandings(group){
+  const teams={};
+  (group.teams||[]).forEach(t=>{teams[t.name]={name:t.name,g:0,w:0,d:0,l:0,gf:0,ga:0,pts:0};});
+  (group.matches||[]).forEach(m=>{
+    if(m.score&&m.score.ft&&m.score.ft.length===2){
+      const hg=m.score.ft[0],ag=m.score.ft[1];
+      const h=m.team1?.name||m.team1,a=m.team2?.name||m.team2;
+      if(!teams[h])teams[h]={name:h,g:0,w:0,d:0,l:0,gf:0,ga:0,pts:0};
+      if(!teams[a])teams[a]={name:a,g:0,w:0,d:0,l:0,gf:0,ga:0,pts:0};
+      teams[h].g++;teams[a].g++;teams[h].gf+=hg;teams[h].ga+=ag;teams[a].gf+=ag;teams[a].ga+=hg;
+      if(hg>ag){teams[h].w++;teams[h].pts+=3;teams[a].l++;}
+      else if(hg<ag){teams[a].w++;teams[a].pts+=3;teams[h].l++;}
+      else{teams[h].d++;teams[h].pts++;teams[a].d++;teams[a].pts++;}
+    }
+  });
+  return Object.values(teams).sort((a,b)=>b.pts-a.pts||(b.gf-b.ga)-(a.gf-a.ga)||b.gf-a.gf);
+}
+
+function renderPoules(data){
+  const groups=data.groups||[];
+  if(!groups.length){document.getElementById('standen-poules').innerHTML='<div class="empty-state"><div class="big">⏳</div><p style="margin-top:12px">Poulestand nog niet beschikbaar — het WK begint op 11 juni 2026.</p></div>';return;}
+  const html='<div class="poule-grid">'+groups.map(group=>{
+    const letter=(group.name||'').replace('Group ','');
+    const standings=calcStandings(group);
+    const rows=standings.map((t,i)=>{
+      const fc=getFlagCode(t.name);
+      return`<tr class="${i<2?'qualified':''}"><td><div class="pt-team"><img class="pt-flag" src="https://flagcdn.com/w40/${fc}.png" onerror="this.style.display='none'">${t.name}</div></td><td style="text-align:center">${t.g}</td><td style="text-align:center">${t.w}</td><td style="text-align:center">${t.d}</td><td style="text-align:center">${t.l}</td><td style="text-align:center">${t.gf}:${t.ga}</td><td style="text-align:center"><span class="pt-pts">${t.pts}</span></td></tr>`;
+    }).join('');
+    return`<div class="poule-card"><div class="poule-header"><span class="ph-gold">Groep ${letter}</span></div><table class="poule-table"><thead><tr><th>Team</th><th>G</th><th>W</th><th>G</th><th>V</th><th>Doel</th><th>Pt</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  }).join('')+'</div>';
+  document.getElementById('standen-poules').innerHTML=html;
+}
+
+function renderWedstrijden(data){
+  const groups=data.groups||[];
+  if(!groups.length){document.getElementById('standen-wedstrijden').innerHTML='<div class="empty-state"><div class="big">⏳</div><p style="margin-top:12px">Wedstrijdschema nog niet beschikbaar.</p></div>';return;}
+  const html=groups.map(group=>{
+    const letter=(group.name||'').replace('Group ','');
+    const matches=(group.matches||[]).map(m=>{
+      const h=m.team1?.name||m.team1||'?',a=m.team2?.name||m.team2||'?';
+      const hc=getFlagCode(h),ac=getFlagCode(a);
+      const hasScore=m.score?.ft?.length===2;
+      const hg=hasScore?m.score.ft[0]:'',ag=hasScore?m.score.ft[1]:'';
+      const date=m.date?new Date(m.date).toLocaleDateString('nl-NL',{day:'numeric',month:'short'}):'';
+      const highlight=h==='Netherlands'||a==='Netherlands'||h==='Belgium'||a==='Belgium';
+      return`<div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border);${highlight?'background:rgba(0,51,160,.04)':''}"><div style="display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600"><img src="https://flagcdn.com/w40/${hc}.png" style="width:22px;height:15px;border-radius:2px;object-fit:cover" onerror="this.style.display='none'">${h}</div><div style="text-align:center">${hasScore?`<span style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:var(--accent)">${hg} – ${ag}</span>`:`<span style="font-size:11px;color:var(--text3)">${date}</span>`}</div><div style="display:flex;align-items:center;justify-content:flex-end;gap:7px;font-size:13px;font-weight:600">${a}<img src="https://flagcdn.com/w40/${ac}.png" style="width:22px;height:15px;border-radius:2px;object-fit:cover" onerror="this.style.display='none'"></div></div>`;
+    }).join('');
+    return`<div class="card" style="margin-bottom:14px;overflow:hidden"><div style="background:var(--accent);padding:8px 14px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;letter-spacing:2px;color:var(--white)">GROEP ${letter}</div>${matches}</div>`;
+  }).join('');
+  document.getElementById('standen-wedstrijden').innerHTML=html||'<div class="empty-state"><div class="big">⏳</div><p style="margin-top:12px">Geen wedstrijden gevonden.</p></div>';
+}
+
 if(isAdmin){document.getElementById('admin-badge').style.display='inline';unlockNav();}
 checkDeadline();
 initBin();
 </script>
-  <script type="module" src="https://widgets.api-sports.io/2.0.3/widgets.js"></script>
 </body>
 </html>
