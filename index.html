@@ -419,7 +419,10 @@ select.field-input option{background:var(--white)}
   </div>
   <div id="admin-scores-panel" style="display:none">
     <div class="real-scores-card">
-      <div class="real-scores-title">⚙ Echte uitslagen invoeren</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div class="real-scores-title" style="margin-bottom:0">⚙ Echte uitslagen invoeren</div>
+        <div style="font-size:11px;color:var(--green);font-weight:600">⚡ Auto-sync actief</div>
+      </div>
       <div class="real-score-row"><div class="rs-team"><img class="mini-flag" src="https://flagcdn.com/w40/nl.png">NL</div><div class="rs-inputs"><input type="number" min="0" max="20" id="rs-nl1h" placeholder="–"><span class="dash" style="font-size:14px">–</span><input type="number" min="0" max="20" id="rs-nl1a" placeholder="–"></div><div class="rs-team right">JP <img class="mini-flag" src="https://flagcdn.com/w40/jp.png"></div><div class="rs-played"><select id="rs-nl1-played" style="font-size:11px;border:1px solid var(--border2);border-radius:4px;background:var(--bg);padding:2px 4px"><option value="0">Niet gespeeld</option><option value="1">Gespeeld</option></select></div></div>
       <div class="real-score-row"><div class="rs-team"><img class="mini-flag" src="https://flagcdn.com/w40/nl.png">NL</div><div class="rs-inputs"><input type="number" min="0" max="20" id="rs-nl2h" placeholder="–"><span class="dash" style="font-size:14px">–</span><input type="number" min="0" max="20" id="rs-nl2a" placeholder="–"></div><div class="rs-team right">SE <img class="mini-flag" src="https://flagcdn.com/w40/se.png"></div><div class="rs-played"><select id="rs-nl2-played" style="font-size:11px;border:1px solid var(--border2);border-radius:4px;background:var(--bg);padding:2px 4px"><option value="0">Niet gespeeld</option><option value="1">Gespeeld</option></select></div></div>
       <div class="real-score-row"><div class="rs-team"><img class="mini-flag" src="https://flagcdn.com/w40/nl.png">NL</div><div class="rs-inputs"><input type="number" min="0" max="20" id="rs-nl3h" placeholder="–"><span class="dash" style="font-size:14px">–</span><input type="number" min="0" max="20" id="rs-nl3a" placeholder="–"></div><div class="rs-team right">TN <img class="mini-flag" src="https://flagcdn.com/w40/tn.png"></div><div class="rs-played"><select id="rs-nl3-played" style="font-size:11px;border:1px solid var(--border2);border-radius:4px;background:var(--bg);padding:2px 4px"><option value="0">Niet gespeeld</option><option value="1">Gespeeld</option></select></div></div>
@@ -438,7 +441,10 @@ select.field-input option{background:var(--white)}
         </div>
         <div><div class="field-lbl" style="font-size:11px">Topscorer</div><input type="text" class="field-input" id="rs-topscorer" placeholder="Naam..." style="font-size:13px;padding:7px 10px"></div>
       </div>
-      <button class="save-scores-btn" onclick="saveRealScores()">Opslaan & punten herberekenen</button>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px">
+        <button class="save-scores-btn" onclick="saveRealScores()">Opslaan & punten herberekenen</button>
+        <button onclick="clearManualOverride()" style="background:none;border:1px solid var(--border2);border-radius:var(--radius);padding:7px 14px;font-size:12px;color:var(--text2);cursor:pointer;font-family:'Barlow',sans-serif">↺ Auto-sync herstellen</button>
+      </div>
       <div id="rs-msg" style="font-size:12px;margin-top:6px;color:var(--text3)"></div>
     </div>
   </div>
@@ -601,11 +607,39 @@ function calcEntryPoints(entry,rs){
   return{pts,details};
 }
 async function saveRealScores(){
-  const rs={nl1h:gv('rs-nl1h'),nl1a:gv('rs-nl1a'),'nl1-played':document.getElementById('rs-nl1-played').value,nl2h:gv('rs-nl2h'),nl2a:gv('rs-nl2a'),'nl2-played':document.getElementById('rs-nl2-played').value,nl3h:gv('rs-nl3h'),nl3a:gv('rs-nl3a'),'nl3-played':document.getElementById('rs-nl3-played').value,be1h:gv('rs-be1h'),be1a:gv('rs-be1a'),'be1-played':document.getElementById('rs-be1-played').value,be2h:gv('rs-be2h'),be2a:gv('rs-be2a'),'be2-played':document.getElementById('rs-be2-played').value,be3h:gv('rs-be3h'),be3a:gv('rs-be3a'),'be3-played':document.getElementById('rs-be3-played').value,winnaar:gv('rs-winnaar'),finalist:gv('rs-finalist'),nlver:gv('rs-nlver'),bever:gv('rs-bever'),topscorer:gv('rs-topscorer')};
+  // Bouw rs op basis van bestaande realScores + handmatige invulling
+  // Markeer handmatig ingevulde velden met _manual zodat auto-sync ze niet overschrijft
+  const matchKeys=['nl1h','nl1a','nl1-played','nl2h','nl2a','nl2-played','nl3h','nl3a','nl3-played','be1h','be1a','be1-played','be2h','be2a','be2-played','be3h','be3a','be3-played'];
+  const rs = Object.assign({}, realScores);
+
+  matchKeys.forEach(k=>{
+    const elId = k.includes('-played') ? 'rs-'+k : 'rs-'+k;
+    const el = document.getElementById(elId);
+    if(el){
+      const val = el.tagName==='SELECT' ? el.value : el.value.trim();
+      if(val !== (realScores[k]||'')){
+        // Waarde is handmatig gewijzigd — markeer als manual
+        rs[k] = val;
+        rs[k+'_manual'] = '1';
+      }
+    }
+  });
+
+  rs.winnaar=gv('rs-winnaar');rs.finalist=gv('rs-finalist');
+  rs.nlver=gv('rs-nlver');rs.bever=gv('rs-bever');rs.topscorer=gv('rs-topscorer');
+
   const data=await readBin();data.realScores=rs;
   const ok=await writeBin(data);
   const msg=document.getElementById('rs-msg');msg.textContent=ok?'✓ Opgeslagen en punten herberekend!':'Fout bij opslaan.';msg.style.color=ok?'var(--green)':'var(--accent2)';
   if(ok){realScores=rs;renderOverview();}
+}
+
+function clearManualOverride(){
+  // Reset manual vlaggen zodat auto-sync weer actief wordt
+  Object.keys(realScores).forEach(k=>{if(k.endsWith('_manual'))delete realScores[k];});
+  writeBin({entries:allEntries,realScores}).then(ok=>{
+    if(ok){document.getElementById('rs-msg').textContent='✓ Handmatige overschrijving verwijderd. Auto-sync actief.';loadEntries('overzicht');}
+  });
 }
 function loadRealScores(rs){
   if(!rs)return;
@@ -613,10 +647,77 @@ function loadRealScores(rs){
   ['nl1','nl2','nl3','be1','be2','be3'].forEach(k=>{const el=document.getElementById('rs-'+k+'-played');if(el&&rs[k+'-played'])el.value=rs[k+'-played'];});
   ['winnaar','finalist','nlver','bever','topscorer'].forEach(k=>{const el=document.getElementById('rs-'+k);if(el&&rs[k])el.value=rs[k];});
 }
+// ── AUTO-SYNC UITSLAGEN UIT OPENFOOTBALL ──
+async function autoSyncScores(){
+  try{
+    const r = await fetch(WC_API);
+    if(!r.ok) return null;
+    const data = await r.json();
+
+    // NL = Netherlands, BE = Belgium in openfootball
+    const NL_TEAMS = ['Netherlands'];
+    const BE_TEAMS = ['Belgium'];
+    const NL_MATCH_KEYS = [
+      {thuis:'Netherlands', uit:'Japan',    key:'nl1'},
+      {thuis:'Netherlands', uit:'Sweden',   key:'nl2'},
+      {thuis:'Netherlands', uit:'Tunisia',  key:'nl3'},
+    ];
+    const BE_MATCH_KEYS = [
+      {thuis:'Belgium',     uit:'Egypt',       key:'be1'},
+      {thuis:'Belgium',     uit:'Iran',        key:'be2'},
+      {thuis:'New Zealand', uit:'Belgium',     key:'be3'},
+    ];
+    const allKeys = [...NL_MATCH_KEYS, ...BE_MATCH_KEYS];
+
+    const synced = {};
+    (data.groups||[]).forEach(group=>{
+      (group.matches||[]).forEach(m=>{
+        const h = m.team1?.name||m.team1||'';
+        const a = m.team2?.name||m.team2||'';
+        const hasScore = m.score?.ft?.length===2;
+        allKeys.forEach(k=>{
+          if(h===k.thuis && a===k.uit){
+            synced[k.key+'h'] = hasScore ? String(m.score.ft[0]) : '';
+            synced[k.key+'a'] = hasScore ? String(m.score.ft[1]) : '';
+            synced[k.key+'-played'] = hasScore ? '1' : '0';
+          }
+        });
+      });
+    });
+    return synced;
+  } catch(e){ return null; }
+}
+
 async function loadEntries(target){
   if(!BIN_ID){setTimeout(()=>loadEntries(target),1500);return;}
-  const data=await readBin();allEntries=data.entries;realScores=data.realScores;
-  if(isAdmin&&target==='overzicht'){document.getElementById('admin-scores-panel').style.display='block';loadRealScores(realScores);}
+  const data=await readBin();
+  allEntries=data.entries;
+  realScores=data.realScores||{};
+
+  // Auto-sync uitslagen uit openfootball (alleen voor poulewedstrijden)
+  const synced = await autoSyncScores();
+  if(synced){
+    let changed = false;
+    Object.keys(synced).forEach(k=>{
+      // Alleen overschrijven als admin het niet handmatig heeft aangepast
+      // We detecteren handmatige aanpassing via een _manual vlag
+      const manualKey = k+'_manual';
+      if(!realScores[manualKey]){
+        if(realScores[k] !== synced[k]){ realScores[k]=synced[k]; changed=true; }
+      }
+    });
+    if(changed){
+      // Sla auto-gesyncte scores op in bin
+      const saveData = await readBin();
+      saveData.realScores = realScores;
+      await writeBin(saveData);
+    }
+  }
+
+  if(isAdmin&&target==='overzicht'){
+    document.getElementById('admin-scores-panel').style.display='block';
+    loadRealScores(realScores);
+  }
   if(target==='overzicht')renderOverview();
   if(target==='rapport')renderCharts();
 }
