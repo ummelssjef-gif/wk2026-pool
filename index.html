@@ -128,6 +128,20 @@ select.field-input option{background:var(--white)}
 .empty-state .big{font-family:'Barlow Condensed',sans-serif;font-size:72px;font-weight:900;color:var(--border2);line-height:1}
 .loading{text-align:center;padding:40px;color:var(--text3);font-size:14px}
 .admin-badge{background:var(--gold);color:var(--accent);font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;margin-left:6px}
+/* STANDEN */
+.poule-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-bottom:24px}
+.poule-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.poule-header{background:var(--accent);padding:8px 14px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;letter-spacing:2px;color:var(--white)}
+.ph-gold{color:var(--gold)}
+.poule-table{width:100%;border-collapse:collapse;font-size:12px}
+.poule-table th{padding:5px 8px;text-align:left;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;font-size:10px;border-bottom:1px solid var(--border)}
+.poule-table td{padding:6px 8px;border-bottom:1px solid var(--border);color:var(--text)}
+.poule-table tr:last-child td{border-bottom:none}
+.poule-table tr.qualified td{background:rgba(0,51,160,.04)}
+.poule-table tr.qualified td:first-child{border-left:3px solid var(--accent)}
+.pt-team{display:flex;align-items:center;gap:6px;font-weight:600}
+.pt-flag{width:20px;height:13px;border-radius:2px;object-fit:cover}
+.pt-pts{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;color:var(--accent)}
 /* SPELREGELS */
 .rules-section{margin-bottom:24px}
 .rules-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.04)}
@@ -650,7 +664,7 @@ function loadRealScores(rs){
 // ── AUTO-SYNC UITSLAGEN UIT OPENFOOTBALL ──
 async function autoSyncScores(){
   try{
-    const r = await fetch(WC_API);
+    const r = await fetch(wcUrl('worldcup.json'));
     if(!r.ok) return null;
     const data = await r.json();
 
@@ -667,19 +681,17 @@ async function autoSyncScores(){
     ];
 
     const synced = {};
-    // openfootball gebruikt rounds[].matches[] met score1/score2
-    (data.rounds||[]).forEach(round=>{
-      (round.matches||[]).forEach(m=>{
-        const h = m.team1?.name||m.team1||'';
-        const a = m.team2?.name||m.team2||'';
-        const hasScore = m.score1!=null && m.score2!=null;
-        allKeys.forEach(k=>{
-          if(h===k.thuis && a===k.uit){
-            synced[k.key+'h'] = hasScore ? String(m.score1) : '';
-            synced[k.key+'a'] = hasScore ? String(m.score2) : '';
-            synced[k.key+'-played'] = hasScore ? '1' : '0';
-          }
-        });
+    // openfootball gebruikt platte matches[] met score.ft
+    (data.matches||[]).forEach(m=>{
+      const h = m.team1?.name||m.team1||'';
+      const a = m.team2?.name||m.team2||'';
+      const sc = m.score&&m.score.ft&&m.score.ft.length===2?m.score.ft:null;
+      allKeys.forEach(k=>{
+        if(h===k.thuis && a===k.uit){
+          synced[k.key+'h'] = sc ? String(sc[0]) : '';
+          synced[k.key+'a'] = sc ? String(sc[1]) : '';
+          synced[k.key+'-played'] = sc ? '1' : '0';
+        }
       });
     });
     return synced;
@@ -786,8 +798,8 @@ function showStandenTab(tab){
   });
 }
 
-const WC_GROUPS_API='https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.groups.json';
-const WC_MATCHES_API='https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json';
+// Cache-busting zodat GitHub altijd de nieuwste versie geeft
+function wcUrl(file){ return 'https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/'+file+'?t='+Math.floor(Date.now()/300000); }
 let wcData=null,wcCacheTime=null;
 const WC_CACHE_MS=60*60*1000;
 
@@ -803,33 +815,30 @@ async function loadStanden(force){
   try{
     // Haal beide bestanden parallel op
     const [groupsRes, matchesRes] = await Promise.all([
-      fetch(WC_GROUPS_API),
-      fetch(WC_MATCHES_API)
+      fetch(wcUrl('worldcup.groups.json')),
+      fetch(wcUrl('worldcup.json'))
     ]);
     if(!groupsRes.ok) throw new Error('Groups HTTP '+groupsRes.status);
     if(!matchesRes.ok) throw new Error('Matches HTTP '+matchesRes.status);
     const groupsData = await groupsRes.json();
     const matchesData = await matchesRes.json();
 
-    // Combineer: groups heeft teams, matches heeft uitslagen
-    // Bouw een map van matches op teamnamen
+    // matchesData.matches is een platte array met group veld en score.ft voor uitslagen
     const matchMap = {};
     (matchesData.matches||[]).forEach(m=>{
-      const h=m.team1?.name||m.team1||'';
-      const a=m.team2?.name||m.team2||'';
-      if(h&&a) matchMap[h+'|'+a] = m;
+      const h = m.team1?.name||m.team1||'';
+      const a = m.team2?.name||m.team2||'';
+      if(h&&a&&m.group) matchMap[h+'|'+a] = m;
     });
 
-    // Voeg matches toe aan elke groep
     const combined = {
       groups: (groupsData.groups||[]).map(g=>{
         const teams = g.teams||[];
-        // Genereer alle mogelijke wedstrijden binnen de groep (round-robin)
         const matches = [];
         for(let i=0;i<teams.length;i++){
           for(let j=i+1;j<teams.length;j++){
-            const key1 = teams[i]+'|'+teams[j];
-            const key2 = teams[j]+'|'+teams[i];
+            const key1=teams[i]+'|'+teams[j];
+            const key2=teams[j]+'|'+teams[i];
             if(matchMap[key1]) matches.push(matchMap[key1]);
             else if(matchMap[key2]) matches.push(matchMap[key2]);
             else matches.push({team1:teams[i],team2:teams[j],group:g.name});
@@ -870,23 +879,27 @@ function getFlagCode(name){
   return map[name]||'un';
 }
 
+function getScore(m){
+  // openfootball gebruikt score.ft = [thuis, uit]
+  if(m.score&&m.score.ft&&m.score.ft.length===2) return m.score.ft;
+  return null;
+}
+
 function parseWCData(data){
-  // data.groups heeft al de gecombineerde groepen met teams en matches
   return (data.groups||[]).map(g=>{
     const teams = {};
-    // Initialiseer alle teams
     (g.teams||[]).forEach(t=>{
-      const name = t.name||t;
-      teams[name] = {name,g:0,w:0,d:0,l:0,gf:0,ga:0,pts:0};
+      const name=t.name||t;
+      teams[name]={name,g:0,w:0,d:0,l:0,gf:0,ga:0,pts:0};
     });
-    // Bereken stand op basis van gespeelde wedstrijden
     (g.matches||[]).forEach(m=>{
-      const h = m.team1?.name||m.team1||'?';
-      const a = m.team2?.name||m.team2||'?';
-      if(!teams[h]) teams[h]={name:h,g:0,w:0,d:0,l:0,gf:0,ga:0,pts:0};
-      if(!teams[a]) teams[a]={name:a,g:0,w:0,d:0,l:0,gf:0,ga:0,pts:0};
-      if(m.score1!=null&&m.score2!=null){
-        const hg=m.score1,ag=m.score2;
+      const h=m.team1?.name||m.team1||'?';
+      const a=m.team2?.name||m.team2||'?';
+      if(!teams[h])teams[h]={name:h,g:0,w:0,d:0,l:0,gf:0,ga:0,pts:0};
+      if(!teams[a])teams[a]={name:a,g:0,w:0,d:0,l:0,gf:0,ga:0,pts:0};
+      const sc=getScore(m);
+      if(sc){
+        const hg=sc[0],ag=sc[1];
         teams[h].g++;teams[a].g++;
         teams[h].gf+=hg;teams[h].ga+=ag;
         teams[a].gf+=ag;teams[a].ga+=hg;
@@ -895,7 +908,7 @@ function parseWCData(data){
         else{teams[h].d++;teams[h].pts++;teams[a].d++;teams[a].pts++;}
       }
     });
-    return {...g, teamStandings: Object.values(teams).sort((a,b)=>b.pts-a.pts||(b.gf-b.ga)-(a.gf-a.ga)||b.gf-a.gf)};
+    return {...g, teamStandings:Object.values(teams).sort((a,b)=>b.pts-a.pts||(b.gf-b.ga)-(a.gf-a.ga)||b.gf-a.gf)};
   });
 }
 
@@ -928,12 +941,12 @@ function renderWedstrijden(data){
     const matches=(group.matches||[]).map(m=>{
       const h=m.team1?.name||m.team1||'?', a=m.team2?.name||m.team2||'?';
       const hc=getFlagCode(h), ac=getFlagCode(a);
-      const hasScore=m.score1!=null&&m.score2!=null;
+      const sc=getScore(m);
       const date=m.date?new Date(m.date).toLocaleDateString('nl-NL',{day:'numeric',month:'short'}):'';
       const highlight=h==='Netherlands'||a==='Netherlands'||h==='Belgium'||a==='Belgium';
       return`<div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border);${highlight?'background:rgba(0,51,160,.04)':''}">
 <div style="display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600"><img src="https://flagcdn.com/w40/${hc}.png" style="width:22px;height:15px;border-radius:2px;object-fit:cover" onerror="this.style.display='none'">${h}</div>
-<div style="text-align:center">${hasScore?`<span style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:var(--accent)">${m.score1}–${m.score2}</span>`:`<span style="font-size:11px;color:var(--text3)">${date}</span>`}</div>
+<div style="text-align:center">${sc?`<span style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:var(--accent)">${sc[0]}–${sc[1]}</span>`:`<span style="font-size:11px;color:var(--text3)">${date}</span>`}</div>
 <div style="display:flex;align-items:center;justify-content:flex-end;gap:7px;font-size:13px;font-weight:600">${a}<img src="https://flagcdn.com/w40/${ac}.png" style="width:22px;height:15px;border-radius:2px;object-fit:cover" onerror="this.style.display='none'"></div></div>`;
     }).join('');
     return`<div class="card" style="margin-bottom:14px;overflow:hidden"><div style="background:var(--accent);padding:8px 14px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;letter-spacing:2px;color:var(--white)">GROEP ${letter}</div>${matches||'<div style="padding:12px 14px;font-size:13px;color:var(--text3)">Wedstrijden nog niet gespeeld.</div>'}</div>`;
