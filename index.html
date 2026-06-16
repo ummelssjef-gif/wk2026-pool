@@ -326,7 +326,18 @@ select.field-input option{background:var(--white)}
           </div>
           <div class="rule-info">
             <div class="rule-title">Verliezend finalist</div>
-            <div class="rule-desc">Voorspel het land dat de finale verliest — de zilverenmedaillewinnaar.</div>
+            <div class="rule-desc">Voorspel het land dat de finale verliest. Je krijgt ook 8 punten als je dit land als winnaar had voorspeld — het stond immers in de finale.</div>
+            <span class="rule-badge rb-bonus">Bonuspunt</span>
+          </div>
+        </div>
+        <div class="rule-row">
+          <div>
+            <div class="rule-pts">8</div>
+            <div class="rule-pts-label">punten</div>
+          </div>
+          <div class="rule-info">
+            <div class="rule-title">Winnaar als finalist voorspeld</div>
+            <div class="rule-desc">Had je de uiteindelijke winnaar als verliezend finalist? Dan krijg je ook 8 punten — je had hem wél in de finale. Bij exact omgekeerd finale: 8 + 8 = 16 punten.</div>
             <span class="rule-badge rb-bonus">Bonuspunt</span>
           </div>
         </div>
@@ -381,14 +392,14 @@ select.field-input option{background:var(--white)}
           <div style="min-width:48px;text-align:center">
             <div style="font-size:13px;color:var(--text3);font-weight:600">20+8+8+5+5</div>
           </div>
-          <div class="rule-info"><div class="rule-title">Alle toernooi bonuspunten</div><div class="rule-desc">= 46 punten</div></div>
+          <div class="rule-info"><div class="rule-title">Alle toernooi bonuspunten</div><div class="rule-desc">= 46 punten (winnaar + finalist + topscorer + hoe ver NL + hoe ver BE)</div></div>
         </div>
         <div class="rule-row" style="background:rgba(0,51,160,.03);margin:0 -18px;padding:12px 18px;border-radius:0 0 var(--radius-lg) var(--radius-lg)">
           <div style="min-width:48px;text-align:center">
             <div class="rule-pts" style="color:var(--gold)">76</div>
             <div class="rule-pts-label">max</div>
           </div>
-          <div class="rule-info"><div class="rule-title" style="font-size:15px">Maximaal haalbare score</div><div class="rule-desc">Perfecte voorspellingen op alle onderdelen.</div></div>
+          <div class="rule-info"><div class="rule-title" style="font-size:15px">Maximaal haalbare score</div><div class="rule-desc">Perfecte voorspellingen op alle onderdelen. Bij exact omgekeerde finale: 16 pt i.p.v. 28 pt.</div></div>
         </div>
       </div>
     </div>
@@ -613,8 +624,22 @@ function calcEntryPoints(entry,rs){
   if(!rs)return null;let pts=0;const details={matches:[],bonus:[]};
   entry.nl.forEach((m,i)=>{const played=rs['nl'+(i+1)+'-played']==='1';if(!played){details.matches.push({label:m.wedstrijd,pts:null,played:false});return;}const p=calcMatchPoints(m.thuis,m.uit,rs['nl'+(i+1)+'h'],rs['nl'+(i+1)+'a']);pts+=p;details.matches.push({label:m.wedstrijd,pred:`${m.thuis||'?'}–${m.uit||'?'}`,real:`${rs['nl'+(i+1)+'h']}–${rs['nl'+(i+1)+'a']}`,pts,played:true,p});});
   entry.be.forEach((m,i)=>{const played=rs['be'+(i+1)+'-played']==='1';if(!played){details.matches.push({label:m.wedstrijd,pts:null,played:false});return;}const p=calcMatchPoints(m.thuis,m.uit,rs['be'+(i+1)+'h'],rs['be'+(i+1)+'a']);pts+=p;details.matches.push({label:m.wedstrijd,pred:`${m.thuis||'?'}–${m.uit||'?'}`,real:`${rs['be'+(i+1)+'h']}–${rs['be'+(i+1)+'a']}`,pts,played:true,p});});
-  if(rs.winnaar&&entry.winnaar){if(entry.winnaar===rs.winnaar){pts+=20;details.bonus.push({label:'Winnaar WK',pts:20,ok:true});}else details.bonus.push({label:'Winnaar WK',pts:0,ok:false});}
-  if(rs.finalist&&entry.finalist){if(entry.finalist===rs.finalist){pts+=8;details.bonus.push({label:'Verliezend finalist',pts:8,ok:true});}else details.bonus.push({label:'Verliezend finalist',pts:0,ok:false});}
+  if(rs.winnaar&&rs.finalist){
+    // Winnaar exact goed
+    if(entry.winnaar&&entry.winnaar===rs.winnaar){pts+=20;details.bonus.push({label:'Winnaar WK (exact)',pts:20,ok:true});}
+    // Winnaar verkeerd maar staat wél in finale (als verliezend finalist voorspeld)
+    else if(entry.winnaar&&entry.winnaar===rs.finalist){pts+=8;details.bonus.push({label:'Winnaar WK (in finale)',pts:8,ok:'partial'});}
+    else if(entry.winnaar){details.bonus.push({label:'Winnaar WK',pts:0,ok:false});}
+
+    // Finalist exact goed
+    if(entry.finalist&&entry.finalist===rs.finalist){pts+=8;details.bonus.push({label:'Verliezend finalist (exact)',pts:8,ok:true});}
+    // Finalist verkeerd maar staat wél in finale (als winnaar voorspeld)
+    else if(entry.finalist&&entry.finalist===rs.winnaar){pts+=8;details.bonus.push({label:'Verliezend finalist (in finale)',pts:8,ok:'partial'});}
+    else if(entry.finalist){details.bonus.push({label:'Verliezend finalist',pts:0,ok:false});}
+  } else {
+    if(rs.winnaar&&entry.winnaar){if(entry.winnaar===rs.winnaar){pts+=20;details.bonus.push({label:'Winnaar WK',pts:20,ok:true});}else details.bonus.push({label:'Winnaar WK',pts:0,ok:false});}
+    if(rs.finalist&&entry.finalist){if(entry.finalist===rs.finalist){pts+=8;details.bonus.push({label:'Verliezend finalist',pts:8,ok:true});}else details.bonus.push({label:'Verliezend finalist',pts:0,ok:false});}
+  }
   if(rs.nlver&&entry.hoe_ver_nl){if(entry.hoe_ver_nl===rs.nlver){pts+=5;details.bonus.push({label:'Hoe ver NL',pts:5,ok:true});}else details.bonus.push({label:'Hoe ver NL',pts:0,ok:false});}
   if(rs.bever&&entry.hoe_ver_be){if(entry.hoe_ver_be===rs.bever){pts+=5;details.bonus.push({label:'Hoe ver BE',pts:5,ok:true});}else details.bonus.push({label:'Hoe ver BE',pts:0,ok:false});}
   if(rs.topscorer&&entry.topscorer){if(fuzzyMatch(canonicalPlayer(entry.topscorer),canonicalPlayer(rs.topscorer))){pts+=8;details.bonus.push({label:'Topscorer',pts:8,ok:true});}else details.bonus.push({label:'Topscorer',pts:0,ok:false});}
