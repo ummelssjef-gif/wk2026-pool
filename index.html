@@ -884,11 +884,49 @@ function renderCharts(){
     item=>allEntries.filter(e=>fuzzyMatch(canonicalPlayer(e.topscorer),item.canonical)).map(e=>e.naam),
     'topscorer');
   const scored=allEntries.map(e=>({naam:e.naam,pts:(calcEntryPoints(e,realScores)||{pts:0}).pts})).sort((a,b)=>b.pts-a.pts);
-  customBarChart('c-stand',scored,
-    item=>item.naam,
-    item=>item.pts,
-    ()=>null,
-    item=>[item.pts+' punten']);
+  const RANK_EMOJIS=[
+    {emoji:'🤩',bg:'#F5C800',bar:'#0033A0'},
+    {emoji:'😄',bg:'#C0C0C0',bar:'#0044CC'},
+    {emoji:'🙂',bg:'#CD7F32',bar:'#2255BB'},
+    {emoji:'😐',bg:'#6B8FA3',bar:'#445588'},
+    {emoji:'😕',bg:'#8B7355',bar:'#556677'},
+    {emoji:'😢',bg:'#999892',bar:'#667788'},
+    {emoji:'😭',bg:'#777777',bar:'#778899'},
+    {emoji:'💀',bg:'#444444',bar:'#888899'},
+  ];
+  const standWrap=document.getElementById('c-stand');
+  if(standWrap){
+    initTooltip();
+    const maxPts=Math.max(...scored.map(e=>e.pts),1);
+    standWrap.innerHTML=scored.map((e,i)=>{
+      const rank=RANK_EMOJIS[Math.min(i,RANK_EMOJIS.length-1)];
+      const pct=Math.max(Math.round((e.pts/maxPts)*100),e.pts>0?12:5);
+      const avatarId='av_stand_'+i;
+      return`<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <div style="font-size:13px;color:#555550;width:140px;text-align:right;flex-shrink:0;font-family:'Barlow',sans-serif;font-weight:500">${e.naam}</div>
+        <div class="chart-bar-track" data-key="stand" data-idx="${i}" data-label="${e.naam}"
+          style="flex:1;height:44px;background:#F0EDE8;border-radius:8px;position:relative;padding-right:28px;cursor:pointer">
+          <div style="height:100%;width:${pct}%;background:${rank.bar};border-radius:8px;display:flex;align-items:center;position:relative;min-width:${e.pts>0?'44px':'5%'}">
+            ${e.pts>0?`<span style="font-size:13px;font-weight:700;color:#fff;padding-left:12px;font-family:'Barlow Condensed',sans-serif">${e.pts}</span>`:''}
+            <div id="${avatarId}" style="position:absolute;right:-20px;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;font-size:20px;background:${rank.bg};flex-shrink:0">${rank.emoji}</div>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+    // Tooltip event listeners
+    if(!window._chartTooltipData) window._chartTooltipData={};
+    window._chartTooltipData['stand']={};
+    scored.forEach((e,i)=>{window._chartTooltipData['stand'][i]=[e.pts+' punten'];});
+    standWrap.querySelectorAll('.chart-bar-track').forEach(el=>{
+      el.addEventListener('mouseenter',function(ev){
+        const k=this.dataset.key,idx=parseInt(this.dataset.idx),lbl=this.dataset.label;
+        const names=(window._chartTooltipData[k]||{})[idx]||[];
+        if(names.length) showTooltip(ev,lbl,names);
+      });
+      el.addEventListener('mousemove',moveTooltip);
+      el.addEventListener('mouseleave',hideTooltip);
+    });
+  }
 }
 function exportCSV(){
   if(!allEntries.length){alert('Nog geen data.');return;}
