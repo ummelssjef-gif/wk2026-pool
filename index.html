@@ -753,15 +753,39 @@ function renderOverview(){
 }
 const WIKI_PHOTOS={'Kylian Mbappé':'https://sortitoutsi.b-cdn.net/uploads/face/face_85139014.png','Harry Kane':'https://sortitoutsi.b-cdn.net/uploads/face/face_28049320.png','Cristiano Ronaldo':'https://b.fssta.com/uploads/application/soccer/headshots/885.vresize.350.350.medium.1.png','Memphis Depay':'https://sortitoutsi.b-cdn.net/uploads/face/face_37024470.png','Erling Haaland':'https://sortitoutsi.b-cdn.net/uploads/face/face_209658424.png','Lionel Messi':'https://sortitoutsi.b-cdn.net/uploads/face/face_158023.png','Neymar Jr.':'https://sortitoutsi.b-cdn.net/uploads/face/face_190871.png','Robert Lewandowski':'https://sortitoutsi.b-cdn.net/uploads/face/face_32004.png','Mohamed Salah':'https://sortitoutsi.b-cdn.net/uploads/face/face_209331.png','Vinícius Júnior':'https://sortitoutsi.b-cdn.net/uploads/face/face_238794.png','Jude Bellingham':'https://sortitoutsi.b-cdn.net/uploads/face/face_237099.png','Lamine Yamal':'https://sortitoutsi.b-cdn.net/uploads/face/face_2000256231.png','Kevin De Bruyne':'https://sortitoutsi.b-cdn.net/uploads/face/face_192985.png','Cody Gakpo':'https://sortitoutsi.b-cdn.net/uploads/face/face_246669.png','Virgil van Dijk':'https://sortitoutsi.b-cdn.net/uploads/face/face_97.png','Romelu Lukaku':'https://sortitoutsi.b-cdn.net/uploads/face/face_192505.png','Karim Benzema':'https://sortitoutsi.b-cdn.net/uploads/face/face_182521.png','Denzel Dumfries':'https://sortitoutsi.b-cdn.net/uploads/face/face_241445.png','Pedri':'https://sortitoutsi.b-cdn.net/uploads/face/face_844940.png','Luka Modrić':'https://sortitoutsi.b-cdn.net/uploads/face/face_177003.png'};
 function playerPhoto(name){return WIKI_PHOTOS[name]||null;}
-function customBarChart(containerId,items,getLabel,getValue,getImageUrl){
+function initTooltip(){
+  if(document.getElementById('chart-tooltip')) return;
+  const t=document.createElement('div');
+  t.id='chart-tooltip';
+  t.style.cssText='position:fixed;background:#111111;color:#fff;padding:8px 12px;border-radius:8px;font-size:12px;font-family:Barlow,sans-serif;pointer-events:none;z-index:9999;display:none;max-width:240px;line-height:1.6;box-shadow:0 4px 16px rgba(0,0,0,.3)';
+  document.body.appendChild(t);
+}
+function showTooltip(e,label,names){
+  const t=document.getElementById('chart-tooltip');if(!t)return;
+  t.innerHTML='<div style="font-weight:700;margin-bottom:5px;color:#F5C800;font-size:13px">'+label+'</div>'+names.map(n=>'<div>👤 '+n+'</div>').join('');
+  t.style.display='block';
+  moveTooltip(e);
+}
+function moveTooltip(e){
+  const t=document.getElementById('chart-tooltip');if(!t||t.style.display==='none')return;
+  const x=e.clientX+14,y=e.clientY-10;
+  t.style.left=(x+t.offsetWidth>window.innerWidth?x-t.offsetWidth-28:x)+'px';
+  t.style.top=(y+t.offsetHeight>window.innerHeight?y-t.offsetHeight:y)+'px';
+}
+function hideTooltip(){const t=document.getElementById('chart-tooltip');if(t)t.style.display='none';}
+
+function customBarChart(containerId,items,getLabel,getValue,getImageUrl,getNames){
   const container=document.getElementById(containerId);if(!container)return;
+  initTooltip();
   const max=Math.max(...items.map(getValue),1);
   container.innerHTML=items.map(item=>{
     const label=getLabel(item);const val=getValue(item);const pct=Math.round((val/max)*100);const imgUrl=getImageUrl(item);
     const initials=label.split(' ').map(w=>w[0]).filter(Boolean).slice(0,2).join('').toUpperCase();
     const avatarId='av_'+label.replace(/[^a-zA-Z0-9]/g,'_');
-    const imgHtml=`<div id="${avatarId}" style="position:absolute;right:-20px;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;overflow:hidden;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.2);background:#CCC8BF;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#555;font-family:'Barlow',sans-serif">${imgUrl?`<img src="${imgUrl}" style="width:100%;height:100%;object-fit:cover;object-position:top" onerror="this.remove();document.getElementById('${avatarId}').innerHTML='<span style=\\'font-size:13px;font-weight:600;color:#555\\'>${initials}</span>'">`:`<span>${initials}</span>`}</div>`;
-    return`<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><div style="font-size:12px;color:#555550;width:130px;text-align:right;flex-shrink:0;font-family:'Barlow',sans-serif">${label}</div><div style="flex:1;height:36px;background:#F0EDE8;border-radius:6px;position:relative;padding-right:26px"><div style="height:100%;width:${pct}%;background:#0033A0;border-radius:6px;display:flex;align-items:center;position:relative;min-width:${val>0?'36px':'0'}">${val>0?`<span style="font-size:12px;font-weight:600;color:#fff;padding-left:10px;font-family:'Barlow Condensed',sans-serif">${val}</span>`:''}${imgHtml}</div></div></div>`;
+    const imgHtml=`<div id="${avatarId}" style="position:absolute;right:-20px;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;overflow:hidden;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.2);background:#CCC8BF;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#555;font-family:'Barlow',sans-serif">${imgUrl?`<img src="${imgUrl}" style="width:100%;height:100%;object-fit:cover;object-position:top" onerror="this.remove();document.getElementById('${avatarId}').innerHTML='<span style=\'font-size:13px;font-weight:600;color:#555\'>${initials}</span>'">`:`<span>${initials}</span>`}</div>`;
+    const names=getNames?getNames(item):[];
+    const tip=names.length?`onmouseenter="showTooltip(event,'${label.replace(/\/g,'\\').replace(/'/g,"\'")}',${JSON.stringify(names)})" onmousemove="moveTooltip(event)" onmouseleave="hideTooltip()"` :'';
+    return`<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px"><div style="font-size:13px;color:#555550;width:140px;text-align:right;flex-shrink:0;font-family:'Barlow',sans-serif;font-weight:500;line-height:1.2">${label}</div><div style="flex:1;height:44px;background:#F0EDE8;border-radius:8px;position:relative;padding-right:28px;cursor:${names.length?'pointer':'default'}" ${tip}><div style="height:100%;width:${pct}%;background:#0033A0;border-radius:8px;display:flex;align-items:center;position:relative;min-width:${val>0?'44px':'0'}">${val>0?`<span style="font-size:13px;font-weight:700;color:#fff;padding-left:12px;font-family:'Barlow Condensed',sans-serif">${val}</span>`:''}${imgHtml}</div></div></div>`;
   }).join('');
 }
 function renderCharts(){
@@ -769,18 +793,45 @@ function renderCharts(){
   if(!allEntries.length){document.getElementById('charts-wrap').innerHTML='<div class="empty-state"><div class="big">📊</div><p style="margin-top:12px">Nog geen voorspellingen.</p></div>';return;}
   const wrap=document.getElementById('charts-wrap');
   wrap.innerHTML=`<div class="chart-card"><div class="chart-title">Wie wint het WK?</div><div id="c-winner-custom" style="padding-right:8px"></div></div><div class="chart-card"><div class="chart-title">Hoe ver komt Nederland?</div><div class="chart-wrap" style="height:220px"><canvas id="c-nl"></canvas></div></div><div class="chart-card"><div class="chart-title">Hoe ver komt België?</div><div class="chart-wrap" style="height:220px"><canvas id="c-be"></canvas></div></div><div class="chart-card"><div class="chart-title">Topscorer voorspellingen</div><div id="c-scorer-custom" style="padding-right:8px"></div></div><div class="chart-card"><div class="chart-title">Stand (punten)</div><div class="chart-wrap" style="height:220px"><canvas id="c-stand"></canvas></div></div>`;
-  function barChart(id,labels,data,horizontal){charts[id]=new Chart(document.getElementById(id),{type:'bar',data:{labels,datasets:[{data,backgroundColor:'#0033A0',borderRadius:5,borderSkipped:false,hoverBackgroundColor:'#E8192C'}]},options:{indexAxis:horizontal?'y':'x',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#999892',font:{family:'Barlow',size:12}},grid:{color:'#E2DDD6'}},y:{ticks:{color:'#999892',font:{family:'Barlow',size:12},precision:0},grid:{color:'#E2DDD6'}}}}});}
+  function barChart(id,labels,data,horizontal,namesByLabel){
+    initTooltip();
+    const el = document.getElementById(id);
+    charts[id]=new Chart(el,{type:'bar',data:{labels,datasets:[{data,backgroundColor:'#0033A0',borderRadius:5,borderSkipped:false,hoverBackgroundColor:'#E8192C'}]},options:{indexAxis:horizontal?'y':'x',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:false,external:function(context){
+      const {chart,tooltip}=context;
+      if(tooltip.opacity===0){hideTooltip();return;}
+      const idx=tooltip.dataPoints?.[0]?.dataIndex;
+      if(idx==null)return;
+      const label=labels[idx];
+      const names=namesByLabel?namesByLabel[label]||[]:[];
+      if(!names.length){hideTooltip();return;}
+      const pos=chart.canvas.getBoundingClientRect();
+      const x=pos.left+tooltip.caretX, y=pos.top+tooltip.caretY;
+      showTooltip({clientX:x,clientY:y},label,names);
+    }}},scales:{x:{ticks:{color:'#999892',font:{family:'Barlow',size:12}},grid:{color:'#E2DDD6'}},y:{ticks:{color:'#999892',font:{family:'Barlow',size:12},precision:0},grid:{color:'#E2DDD6'}}}}});
+    el.addEventListener('mouseleave',hideTooltip);
+  }
   const winFreq={};allEntries.forEach(e=>{if(e.winnaar)winFreq[e.winnaar]=(winFreq[e.winnaar]||0)+1;});
   const winItems=Object.entries(winFreq).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([n,c])=>({name:n,count:c}));
-  customBarChart('c-winner-custom',winItems,item=>item.name,item=>item.count,item=>{const ct=ALL_COUNTRIES.find(x=>x.n===item.name);return ct?`https://flagcdn.com/w160/${ct.c}.png`:null;});
+  customBarChart('c-winner-custom',winItems,item=>item.name,item=>item.count,
+    item=>{const ct=ALL_COUNTRIES.find(x=>x.n===item.name);return ct?`https://flagcdn.com/w160/${ct.c}.png`:null;},
+    item=>allEntries.filter(e=>e.winnaar===item.name).map(e=>e.naam));
   const rounds=['Groepsfase uit','1/16 finale','1/8 finale','Kwartfinale','Halve finale','Derde plaats','Finale (verlies)','🏆 Wereldkampioen'];
-  function roundBar(field,id){const freq={};allEntries.forEach(e=>{if(e[field])freq[e[field]]=(freq[e[field]]||0)+1;});const lbls=rounds.filter(r=>freq[r]);barChart(id,lbls,lbls.map(l=>freq[l]||0),false);}
+  function roundBar(field,id){
+    const freq={};
+    allEntries.forEach(e=>{if(e[field])freq[e[field]]=(freq[e[field]]||0)+1;});
+    const lbls=rounds.filter(r=>freq[r]);
+    const namesByLabel={};
+    lbls.forEach(l=>{namesByLabel[l]=allEntries.filter(e=>e[field]===l).map(e=>e.naam);});
+    barChart(id,lbls,lbls.map(l=>freq[l]||0),false,namesByLabel);
+  }
   roundBar('hoe_ver_nl','c-nl');roundBar('hoe_ver_be','c-be');
   const sfGroups=[];allEntries.forEach(e=>{if(!e.topscorer)return;const ts=canonicalPlayer(e.topscorer);const g=sfGroups.find(g=>fuzzyMatch(g.canonical,ts));if(g){g.count++;if(ts.length>g.canonical.length)g.canonical=ts;}else sfGroups.push({canonical:ts,count:1});});
   const top=sfGroups.sort((a,b)=>b.count-a.count).slice(0,8);
-  customBarChart('c-scorer-custom',top,item=>item.canonical,item=>item.count,item=>playerPhoto(item.canonical));
+  customBarChart('c-scorer-custom',top,item=>item.canonical,item=>item.count,item=>playerPhoto(item.canonical),
+    item=>allEntries.filter(e=>fuzzyMatch(canonicalPlayer(e.topscorer),item.canonical)).map(e=>e.naam));
   const scored=allEntries.map(e=>({naam:e.naam,pts:(calcEntryPoints(e,realScores)||{pts:0}).pts})).sort((a,b)=>b.pts-a.pts);
-  barChart('c-stand',scored.map(e=>e.naam),scored.map(e=>e.pts),true);
+  const standNames={};scored.forEach(e=>{standNames[e.naam]=[e.naam+': '+e.pts+' punten'];});
+  barChart('c-stand',scored.map(e=>e.naam),scored.map(e=>e.pts),true,standNames);
 }
 function exportCSV(){
   if(!allEntries.length){alert('Nog geen data.');return;}
